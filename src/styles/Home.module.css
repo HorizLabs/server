@@ -53,6 +53,11 @@
   animation: colorChange 1s;
 }
 
+.information_error {
+  color: red;
+  font-size: 0.8em;
+}
+
 @keyframes colorChange {
   0% {
     background-color: #ff9658;

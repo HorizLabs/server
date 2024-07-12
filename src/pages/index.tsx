@@ -5,9 +5,10 @@ import { db } from "@/db/db";
 import { account } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import Image from "next/image";
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
+import Button from '@mui/joy/Button';
 
-export const getServerSideProps = (async () => {
+export const getServerSideProps = (async () => {  
   // Get account information to determine if there is an owner account.
   let account_information = await db.select().from(account).where(eq(account.id, 1))
   return {
@@ -17,10 +18,13 @@ export const getServerSideProps = (async () => {
 })
 
 export default function Home(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  // Flags
+  let [errorInfo, setErrorInfo] = useState<string>('')
+  let [buttonStatus, setButtonStatus] = useState<boolean>(false)
   // Function to handle creation of owner account
   async function accountSystem(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    
+    setButtonStatus(true)
     const formData = new FormData(event.currentTarget)
     const response = await fetch('/api/account', {
       method: 'POST',
@@ -28,7 +32,12 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
     })
 
     const data = await response.json()
-    console.log(data)
+    if (data.coreStatus === 'RESPONSE_SUCCESS') {
+      window.location.href = '/dashboard'
+    } else {
+      setErrorInfo(data.message)
+      setButtonStatus(false)
+    }
   }
 
   return (
@@ -48,10 +57,11 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
             <h2>{props.accountCreationStatus ? 'Login to Horizon Labs.' : 'Create your Horizon Labs Account.'}</h2>
           </div>
           <form className={styles.account_form} onSubmit={accountSystem}>
+            {errorInfo != '' ? <p className={styles.information_error}>{errorInfo}</p>: null}
             {!props.accountCreationStatus ? <input type="text" name="name" placeholder="Name" required/>: null}
             <input type="email" name="email" placeholder="Email" required/>
             <input type="password" name="password" placeholder="Password" required/>
-            <button type="submit">{props.accountCreationStatus ? 'Login' : 'Create Account'}</button>
+            {buttonStatus ? <Button loading>Loading</Button>: <Button type="submit">{props.accountCreationStatus ? 'Login' : 'Create Account'}</Button>}
           </form>
         </div>
       </main>
