@@ -1,7 +1,36 @@
 import Head from "next/head";
 import styles from "@/styles/Home.module.css";
+import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
+import { db } from "@/db/db";
+import { account } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import Image from "next/image";
+import { FormEvent } from "react";
 
-export default function Home() {
+export const getServerSideProps = (async () => {
+  // Get account information to determine if there is an owner account.
+  let account_information = await db.select().from(account).where(eq(account.id, 1))
+  return {
+    // Ternary operator for that determination
+    props: {accountCreationStatus: (account_information.length != 0 ? true : false)}
+  }
+})
+
+export default function Home(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  // Function to handle creation of owner account
+  async function accountSystem(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    
+    const formData = new FormData(event.currentTarget)
+    const response = await fetch('/api/account', {
+      method: 'POST',
+      body: JSON.stringify(Object.fromEntries(formData.entries())),
+    })
+
+    const data = await response.json()
+    console.log(data)
+  }
+
   return (
     <>
       <Head>
@@ -14,7 +43,16 @@ export default function Home() {
         <div className={styles.login_background}>
         </div>
         <div className={styles.login_form}>
-          <h2>Login to Horizon Labs</h2>
+          <div className={styles.login_form_header}>
+            <Image src="/logo.png" alt="Horizon Labs Logo" width={100} height={100} />
+            <h2>{props.accountCreationStatus ? 'Login to Horizon Labs.' : 'Create your Horizon Labs Account.'}</h2>
+          </div>
+          <form className={styles.account_form} onSubmit={accountSystem}>
+            {!props.accountCreationStatus ? <input type="text" name="name" placeholder="Name" required/>: null}
+            <input type="email" name="email" placeholder="Email" required/>
+            <input type="password" name="password" placeholder="Password" required/>
+            <button type="submit">{props.accountCreationStatus ? 'Login' : 'Create Account'}</button>
+          </form>
         </div>
       </main>
     </>

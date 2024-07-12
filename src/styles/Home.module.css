@@ -12,9 +12,55 @@
   background-color: rgb(240, 240, 240);
   left: 50%;
   top: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5em;
   transform: translate(-50%, -50%);
   border: 2px solid #c4c4c4;
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.login_form .login_form_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5em;
+}
+
+.login_form .account_form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.login_form .account_form input {
+  border-radius: 10px;
+  padding: 10px;
+  border: 1px solid #c4c4c4;
+}
+
+.login_form .account_form button {
+  border-radius: 10px;
+  padding: 10px;
+  background-color: #ff9658;
+  border: 1px solid #c4c4c4;
+  cursor: pointer;
+}
+
+.login_form .account_form button:focus {
+  animation: colorChange 1s;
+}
+
+@keyframes colorChange {
+  0% {
+    background-color: #ff9658;
+  }
+  50% {
+    background-color: #fa8e4f;
+  }
+  100% {
+    background-color: #ff9658;
+  }
 }
