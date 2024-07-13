@@ -41,6 +41,12 @@ export const getServerSideProps = (async (args: any) => {
 })
 
 export default function Home(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+    // Set account info
+    useEffect(() => {
+        if (!props.sessionStatus)  {
+            window.location.href = '/'
+        }
+    })
     if (props.accountLoginStatus) {
         return (
             <Head>
@@ -48,12 +54,7 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
             </Head>
         )    
     }
-    // Set account info
-    useEffect(() => {
-        if (!props.sessionStatus)  {
-            window.location.href = '/'
-        }
-    })
+
     let account_info = props.account
     return(
         <>
