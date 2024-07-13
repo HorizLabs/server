@@ -16,7 +16,7 @@ export const getServerSideProps = (async (args: any) => {
             props: {sessionStatus: false}
         }
     } else {
-        console.log(args.req.cookies['token'])
+        console.log(args.req.cookies['token'], process.env.JWT_Secret)
         // @ts-ignore
         let token_info = await (await jwt.jwtVerify(cookie, crypto.createSecretKey(process.env.JWT_Secret, 'utf-8')));
         let email = token_info.payload?.email;
