@@ -23,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // @ts-ignore
         let token_info = await new jwt.SignJWT({'email': data.email}).setProtectedHeader({alg: 'HS256'}).setExpirationTime('5d').sign(crypto.createSecretKey(process.env?.JWT_SECRET, 'utf-8'))
         // Set cookie and response
-        res.setHeader('Set-Cookie', `token=${token_info}`)
+        res.setHeader('Set-Cookie', `token=${token_info}; path=/; sameSite=strict;`)
         res.status(200).json({ coreStatus: 'RESPONSE_SUCCESS', message: 'Account created.'})
     } else {
         let account_info = await db.select().from(account).where(eq(account.email, data.email))
@@ -43,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             let token_info = await new jwt.SignJWT({'email': data.email}).setProtectedHeader({alg: 'HS256'}).setExpirationTime('5d').sign(crypto.createSecretKey(process.env?.JWT_SECRET, 'utf-8'))
 
             // Set cookie and response
-            res.setHeader('Set-Cookie', `token=${token_info}`)
+            res.setHeader('Set-Cookie', `token=${token_info}; path=/; sameSite=strict;`)
             res.status(200).json({ coreStatus: 'RESPONSE_SUCCESS', message: 'Account logged in.'})
         }
     }
