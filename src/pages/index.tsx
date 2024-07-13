@@ -8,7 +8,12 @@ import Image from "next/image";
 import { FormEvent, useState } from "react";
 import Button from '@mui/joy/Button';
 
-export const getServerSideProps = (async () => {  
+export const getServerSideProps = (async (args: any) => {  
+  if (args.req.cookies['token'].length != 0) {
+    return {
+      props: {accountLoginStatus: true}
+    }
+  }
   // Get account information to determine if there is an owner account.
   let account_information = await db.select().from(account).where(eq(account.id, 1))
   return {
@@ -18,6 +23,9 @@ export const getServerSideProps = (async () => {
 })
 
 export default function Home(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  if (props.accountLoginStatus) {
+    window.location.href = '/dashboard'
+  }
   // Flags
   let [errorInfo, setErrorInfo] = useState<string>('')
   let [buttonStatus, setButtonStatus] = useState<boolean>(false)
