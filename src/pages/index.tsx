@@ -7,9 +7,10 @@ import { eq } from "drizzle-orm";
 import Image from "next/image";
 import { FormEvent, useState } from "react";
 import Button from '@mui/joy/Button';
+import { redirect } from "next/navigation";
 
 export const getServerSideProps = (async (args: any) => {  
-  if (args.req.cookies['token'].length != 0) {
+  if (typeof args.req.cookies['token'] != 'undefined') {
     return {
       props: {accountLoginStatus: true}
     }
@@ -24,7 +25,14 @@ export const getServerSideProps = (async (args: any) => {
 
 export default function Home(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   if (props.accountLoginStatus) {
-    window.location.href = '/dashboard'
+    // redirect to dashboard
+    return (
+      <>
+        <Head>
+          <meta httpEquiv="refresh" content="0;url=/dashboard" />
+        </Head>
+      </>
+    )
   }
   // Flags
   let [errorInfo, setErrorInfo] = useState<string>('')
