@@ -24,6 +24,9 @@ export const getServerSideProps = (async (args: any) => {
 })
 
 export default function Home(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  // Flags
+  let [errorInfo, setErrorInfo] = useState<string>('')
+  let [buttonStatus, setButtonStatus] = useState<boolean>(false)
   if (props.accountLoginStatus) {
     // redirect to dashboard
     return (
@@ -34,9 +37,6 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
       </>
     )
   }
-  // Flags
-  let [errorInfo, setErrorInfo] = useState<string>('')
-  let [buttonStatus, setButtonStatus] = useState<boolean>(false)
   // Function to handle creation of owner account
   async function accountSystem(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
