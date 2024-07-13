@@ -16,10 +16,12 @@ export const getServerSideProps = (async (args: any) => {
             props: {sessionStatus: false}
         }
     } else {
+        console.log(args.req.cookies['token'])
         // @ts-ignore
-        let token_info = await (await jwt.jwtVerify(cookie, crypto.createSecretKey(process.env.JWT_Secret, 'utf-8'))).payload?.email;
+        let token_info = await (await jwt.jwtVerify(cookie, crypto.createSecretKey(process.env.JWT_Secret, 'utf-8')));
+        let email = token_info.payload?.email;
         // @ts-ignore
-        let account_info = await db.select().from(account).where(eq(account.email, token_info))
+        let account_info = await db.select().from(account).where(eq(account.email, email))
         if (account_info.length == 0) {
             return {
                 // Ternary operator for that determination

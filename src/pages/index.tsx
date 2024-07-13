@@ -7,7 +7,6 @@ import { eq } from "drizzle-orm";
 import Image from "next/image";
 import { FormEvent, useState } from "react";
 import Button from '@mui/joy/Button';
-import { redirect } from "next/navigation";
 
 export const getServerSideProps = (async (args: any) => {  
   if (typeof args.req.cookies['token'] != 'undefined') {
