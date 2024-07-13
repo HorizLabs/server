@@ -8,6 +8,12 @@ import * as crypto from "crypto";
 import { InferGetServerSidePropsType } from "next";
 
 export const getServerSideProps = (async (args: any) => {  
+    // Check to ensure that there is a cookie when the page is loaded.
+    if (typeof args.req.cookies['token'] == 'undefined') {
+        return {
+          props: {accountLoginStatus: true}
+        }
+      }    
     let cookie = args.req.cookies['token']
     // Get account information to determine if there is an owner account.
     if (!cookie) {
@@ -35,6 +41,13 @@ export const getServerSideProps = (async (args: any) => {
 })
 
 export default function Home(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+    if (props.accountLoginStatus) {
+        return (
+            <Head>
+                <meta httpEquiv="refresh" content="0;url=/" />
+            </Head>
+        )    
+    }
     // Set account info
     useEffect(() => {
         if (!props.sessionStatus)  {
