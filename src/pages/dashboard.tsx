@@ -8,6 +8,12 @@ import * as crypto from "crypto";
 import { InferGetServerSidePropsType } from "next";
 
 export const getServerSideProps = (async (args: any) => {  
+    // Check to ensure that there is a cookie when the page is loaded.
+    if (typeof args.req.cookies['token'] == 'undefined') {
+        return {
+          props: {accountLoginStatus: true}
+        }
+      }    
     let cookie = args.req.cookies['token']
     // Get account information to determine if there is an owner account.
     if (!cookie) {
@@ -17,9 +23,10 @@ export const getServerSideProps = (async (args: any) => {
         }
     } else {
         // @ts-ignore
-        let token_info = await (await jwt.jwtVerify(cookie, crypto.createSecretKey(process.env.JWT_Secret, 'utf-8'))).payload?.email;
+        let token_info = await (await jwt.jwtVerify(cookie, crypto.createSecretKey(process.env.JWT_SECRET, 'utf-8')));
+        let email = token_info.payload?.email;
         // @ts-ignore
-        let account_info = await db.select().from(account).where(eq(account.email, token_info))
+        let account_info = await db.select().from(account).where(eq(account.email, email))
         if (account_info.length == 0) {
             return {
                 // Ternary operator for that determination
@@ -40,6 +47,14 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
             window.location.href = '/'
         }
     })
+    if (props.accountLoginStatus) {
+        return (
+            <Head>
+                <meta httpEquiv="refresh" content="0;url=/" />
+            </Head>
+        )    
+    }
+
     let account_info = props.account
     return(
         <>
