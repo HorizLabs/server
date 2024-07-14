@@ -6,7 +6,7 @@ import { account } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import Image from "next/image";
 import { FormEvent, useState } from "react";
-import Button from '@mui/joy/Button';
+import { Loader } from "@mantine/core";
 
 export const getServerSideProps = (async (args: any) => {  
   if (typeof args.req.cookies['token'] != 'undefined') {
@@ -76,7 +76,7 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
             {!props.accountCreationStatus ? <input type="text" name="name" placeholder="Name" required/>: null}
             <input type="email" name="email" placeholder="Email" required/>
             <input type="password" name="password" placeholder="Password" required/>
-            {buttonStatus ? <Button loading>Loading</Button>: <Button type="submit">{props.accountCreationStatus ? 'Login' : 'Create Account'}</Button>}
+            {buttonStatus ? <button><Loader color="blue" /></button>: <button type="submit">{props.accountCreationStatus ? 'Login' : 'Create Account'}</button>}
           </form>
         </div>
       </main>
