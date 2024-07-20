@@ -1,11 +1,11 @@
 {
-  "id": "b8f44cd4-8f0f-4243-94c4-3d006857da09",
+  "id": "d6b31fde-025f-4c04-bdf8-5625216d3e07",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "platform.account": {
-      "name": "account",
+    "platform.platform_account": {
+      "name": "platform_account",
       "schema": "platform",
       "columns": {
         "id": {

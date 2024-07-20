@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1721501633781,
-      "tag": "0000_nappy_thunderball",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1721501664807,
-      "tag": "0001_spooky_frightful_four",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1721501686446,
-      "tag": "0002_yummy_korvac",
+      "when": 1721509412867,
+      "tag": "0000_eager_blade",
       "breakpoints": true
     }
   ]

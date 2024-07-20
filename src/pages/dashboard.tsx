@@ -10,34 +10,61 @@ import Navbar from "@/components/Navbar";
 import styles from '@/styles/Dashboard.module.css'
 
 export const getServerSideProps = (async (args: any) => {  
-    // Check to ensure that there is a cookie when the page is loaded.
-    if (typeof args.req.cookies['token'] == 'undefined') {
-        return {
-          props: {accountLoginStatus: true}
-        }
-      }    
-    let cookie = args.req.cookies['token']
-    // Get account information to determine if there is an owner account.
-    if (!cookie) {
-        return {
-            // Ternary operator for that determination
-            props: {sessionStatus: false}
-        }
-    } else {
-        // @ts-ignore
-        let token_info = await (await jwt.jwtVerify(cookie, crypto.createSecretKey(process.env.JWT_SECRET, 'utf-8')));
-        let email = token_info.payload?.email;
-        // @ts-ignore
-        let account_info = await db.select().from(account).where(eq(account.email, email))
-        if (account_info.length == 0) {
+    try {
+        // Check to ensure that there is a cookie when the page is loaded.
+        if (typeof args.req.cookies['token'] == 'undefined') {
+            return {
+            props: {accountLoginStatus: true}
+            }
+        }    
+        let cookie = args.req.cookies['token']
+        // Get account information to determine if there is an owner account.
+        if (!cookie) {
             return {
                 // Ternary operator for that determination
                 props: {sessionStatus: false}
             }
+        } else {
+            // @ts-ignore
+            let token_info = await (await jwt.jwtVerify(cookie, crypto.createSecretKey(process.env.JWT_SECRET, 'utf-8')));
+            let email = token_info.payload?.email;
+            // @ts-ignore
+            let account_info = await db.select().from(account).where(eq(account.email, email))
+            if (account_info.length == 0) {
+                return {
+                    // Ternary operator for that determination
+                    props: {sessionStatus: false}
+                }
+            }
+            // Time to provide supplementary information
+            if (account_info[0].role == 'owner') {
+                // Provide recommendations and recommended actions
+                let recommended_actions = []
+                if ((await db.select().from(account)).length == 1) {
+                    recommended_actions.push({
+                        action: 'Add users',
+                        description: 'Add users to the platform to be able to help manage and create tests',
+                        link: '/users',
+                        icon: 'Users',
+                        color_gradient: 'linear-gradient(43deg, rgba(2,0,36,1) 0%, rgba(61,93,168,1) 26%, rgba(112,139,215,1) 48%, rgba(132,92,229,1) 72%, rgba(79,0,255,1) 100%)'
+                    })
+                }
+
+                return {
+                    // Ternary operator for that determination
+                    props: {sessionStatus: true, account: account_info[0], recommended_actions: recommended_actions}
+                }
+            }
+            
+            return {
+                // Ternary operator for that determination
+                props: {sessionStatus: true, account: account_info[0]}
+            }
         }
+    } catch {
+        // Catch and attempt to logout 
         return {
-            // Ternary operator for that determination
-            props: {sessionStatus: true, account: account_info[0]}
+            props: {sessionStatus: false}
         }
     }
 })
@@ -46,7 +73,7 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
     // Set account info
     useEffect(() => {
         if (!props.sessionStatus)  {
-            window.location.href = '/'
+            window.location.href = '/logout'
         }
     })
     if (props.accountLoginStatus) {
@@ -74,7 +101,29 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
             <Navbar />
             <main className={styles.content}>
                 <h1>My dashboard</h1>
-
+                {(props.recommended_actions.length > 0 && account_info.role == 'owner') ? (<>
+                    <div className={styles.actions}>
+                        <h1>To do</h1>
+                        <div className={styles.actionrow}>
+                            {
+                                props.recommended_actions?.map((action, index) => {
+                                    return (
+                                        <a key={index} href={action.link} className={styles.action}>
+                                            <div style={{'background': action.color_gradient, 'height': '60px', 'borderRadius': '10px'}}>
+                                            </div>
+                                            <div className={styles.action_header}>
+                                                <h3>{action.action}</h3>
+                                            </div>
+                                            <div className={styles.action_body}>
+                                                <p>{action.description}</p>
+                                            </div>
+                                        </a>
+                                    )
+                                })
+                            }
+                        </div>
+                    </div>
+                </>) : null}
             </main>
         </>
     )
