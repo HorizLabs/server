@@ -3,6 +3,7 @@
 ./src/db/migrations/*
 # dependencies
 .env
+*.env
 ./node_modules/*
 /node_modules/*
 /.pnp
