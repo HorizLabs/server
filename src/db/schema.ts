@@ -1,14 +1,13 @@
 import { pgEnum, pgSchema, serial, text } from "drizzle-orm/pg-core";
 
-export const testa = pgSchema('testa')
+export const platform = pgSchema('platform')
 
-export const userRole = pgEnum('role', ['owner', 'administrator', 'staff', 'development'])
 
-export const account = testa.table('account', {
+export const account = platform.table('account', {
     id: serial('id').primaryKey(),
     name: text('name'),
     email: text('email'),
     password: text('password'),
     salt: text('salt'),
-    role: userRole('role'),
+    role: text('role'),
 })

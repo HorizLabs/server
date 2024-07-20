@@ -7,6 +7,7 @@ import * as jwt from "jose";
 import * as crypto from "crypto";
 import { InferGetServerSidePropsType } from "next";
 import Navbar from "@/components/Navbar";
+import styles from '@/styles/Dashboard.module.css'
 
 export const getServerSideProps = (async (args: any) => {  
     // Check to ensure that there is a cookie when the page is loaded.
@@ -57,6 +58,7 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
     }
 
     let account_info = props.account
+    console.log(account_info)
     return(
         <>
             <Head>
@@ -70,6 +72,10 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
             <h3>User ID: {account_info.id}</h3>
             <h3>User role: {account_info.role}</h3> */}
             <Navbar />
+            <main className={styles.content}>
+                <h1>My dashboard</h1>
+
+            </main>
         </>
     )
 }

@@ -15,7 +15,7 @@ export const getServerSideProps = (async (args: any) => {
     }
   }
   // Get account information to determine if there is an owner account.
-  let account_information = await db.select().from(account).where(eq(account.id, 1))
+  let account_information = await db.select().from(account)
   return {
     // Ternary operator for that determination
     props: {accountCreationStatus: (account_information.length != 0 ? true : false)}

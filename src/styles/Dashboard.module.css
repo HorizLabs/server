@@ -1,0 +1,6 @@
+.content {
+  display: flex;
+  gap: 1em;
+  flex: 1;
+  margin-left: 310px;
+}

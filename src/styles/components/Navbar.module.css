@@ -8,6 +8,7 @@
     gap: 1em;    
     transition: 300ms;
     padding-top: 50px;
+    flex: 1;
 }
 
 .sidebar__logo {
@@ -50,4 +51,5 @@
     bottom: 0;
     width: 100%;
     padding: 10px;
+    justify-content: space-evenly;
 }

@@ -1,12 +1,12 @@
 {
-  "id": "c2606ed7-11c5-4478-8980-2854c6f0e5a4",
+  "id": "b8f44cd4-8f0f-4243-94c4-3d006857da09",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "testa.account": {
+    "platform.account": {
       "name": "account",
-      "schema": "testa",
+      "schema": "platform",
       "columns": {
         "id": {
           "name": "id",
@@ -40,8 +40,7 @@
         },
         "role": {
           "name": "role",
-          "type": "role",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         }
@@ -52,20 +51,9 @@
       "uniqueConstraints": {}
     }
   },
-  "enums": {
-    "public.role": {
-      "name": "role",
-      "schema": "public",
-      "values": [
-        "owner",
-        "administrator",
-        "staff",
-        "development"
-      ]
-    }
-  },
+  "enums": {},
   "schemas": {
-    "testa": "testa"
+    "platform": "platform"
   },
   "sequences": {},
   "_meta": {

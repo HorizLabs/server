@@ -1,5 +1,5 @@
 import styles from "@/styles/components/Navbar.module.css";
-import { Box } from "react-feather";
+import { Box, Lock, Paperclip, Settings } from "react-feather";
 
 export default function Navbar() {
     return (
@@ -12,8 +12,17 @@ export default function Navbar() {
                 <a className={styles.sidebar__content}>
                     <Box /> Dashboard
                 </a>
+                <a className={styles.sidebar__content}>
+                    <Paperclip /> Tests
+                </a>
+                <a className={styles.sidebar__content}>
+                    <Lock /> Security
+                </a>
             </div>
             <div className={styles.sidebar__footer}>
+                <div className="left">
+                    <a href="/settings"><Settings /></a>                    
+                </div>
                 <a href="/logout">Logout</a>
             </div>
         </nav>
