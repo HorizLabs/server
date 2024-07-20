@@ -12,13 +12,13 @@ export default function Navbar() {
                 <a className={styles.sidebar__content} href="/dashboard">
                     <Box /> Dashboard
                 </a>
-                <a className={styles.sidebar__content}>
+                <a className={styles.sidebar__content} href="/tests">
                     <Paperclip /> Tests
                 </a>
-                <a className={styles.sidebar__content}>
+                <a className={styles.sidebar__content} href="/security">
                     <Lock /> Security
                 </a>
-                <a className={styles.sidebar__content}>
+                <a className={styles.sidebar__content} href="/users">
                     <Users /> Users
                 </a>
             </div>

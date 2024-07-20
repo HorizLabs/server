@@ -7,7 +7,9 @@ import * as jwt from "jose";
 import * as crypto from "crypto";
 import { InferGetServerSidePropsType } from "next";
 import Navbar from "@/components/Navbar";
-import styles from '@/styles/Dashboard.module.css'
+import styles from '@/styles/Tests.module.css'
+import { FilePlus, Paperclip } from "react-feather";
+import { Button } from "@mantine/core";
 
 export const getServerSideProps = (async (args: any) => {  
     try {
@@ -103,32 +105,18 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
             <h3>User role: {account_info.role}</h3> */}
             <Navbar />
             <main className={styles.content}>
-                <h1>My dashboard</h1>
-                {/* @ts-ignore */}
-                {((props.recommended_actions.length > 0 && account_info.role == 'owner')) ? (<>
-                    <div className={styles.actions}>
-                        <h1>To do</h1>
-                        <div className={styles.actionrow}>
-                            {
-                                props.recommended_actions?.map((action, index) => {
-                                    return (
-                                        <a key={index} href={action.link} className={styles.action}>
-                                            <div style={{'background': action.color_gradient, 'height': '75px', 'borderRadius': '10px'}}>
-                                            </div>
-                                            <div className={styles.action_header}>
-                                                <h3>{action.action}</h3>
-                                            </div>                      
-                                            <hr className={styles.header_action} />                      
-                                            <div className={styles.action_body}>
-                                                <p>{action.description}</p>
-                                            </div>
-                                        </a>
-                                    )
-                                })
-                            }
-                        </div>
+                <div className={styles.header}>
+                    <h1><Paperclip /> Tests</h1>
+                    <hr />
+                </div>
+                <div className={styles.testContainer}>
+                    <div className={styles.createTest}>
+                        {(account_info?.role == 'owner' || account_info?.role == 'admin') ? (<Button className={styles.createButton}><span className={styles.textContent}><FilePlus />  Create a test</span></Button>) : null}
                     </div>
-                </>) : null}
+                    <div className={styles.tests}>
+                        {/* Do this later */}
+                    </div>
+                </div>
             </main>
         </>
     )
