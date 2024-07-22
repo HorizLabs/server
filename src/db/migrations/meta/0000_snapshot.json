@@ -1,5 +1,5 @@
 {
-  "id": "fb1261c7-8c66-4da2-a71e-049bf77f9fce",
+  "id": "2637da6c-39b5-47fe-944e-24d5a9646242",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -72,12 +72,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "created_by": {
-          "name": "created_by",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "created_on": {
           "name": "created_on",
           "type": "date",
@@ -87,7 +81,7 @@
         },
         "end_by": {
           "name": "end_by",
-          "type": "date",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },

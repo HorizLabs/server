@@ -2,14 +2,15 @@ import Head from "next/head";
 import { db } from "@/db/db";
 import { account } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import * as jwt from "jose";
 import * as crypto from "crypto";
 import { InferGetServerSidePropsType } from "next";
 import Navbar from "@/components/Navbar";
 import styles from '@/styles/Tests.module.css'
 import { FilePlus, Paperclip } from "react-feather";
-import { Button } from "@mantine/core";
+import { Button,Loader,Modal, TextInput } from "@mantine/core";
+import { useDisclosure } from '@mantine/hooks';
 
 export const getServerSideProps = (async (args: any) => {  
     try {
@@ -75,7 +76,43 @@ export const getServerSideProps = (async (args: any) => {
     }
 })
 
-export default function Home(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Tests(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+    // Submit test creation
+    let [buttonCreateStatus, setButtonCreateStatus] = useState<boolean>(false)
+    // @ts-ignore
+    const createTest = async (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
+        setButtonCreateStatus(true)
+        let [name,
+            description,
+            start_date,
+            start_time,
+            end_date,
+            end_time
+        ] = [event.target.name.value, 
+            event.target.description.value,
+            event.target.start_date.value,
+            event.target.start_time.value,
+            event.target.end_date.value,
+            event.target.end_time.value
+        ]
+        let start_period = new Date(`${start_date} ${start_time}`).getTime()
+        let end_period = new Date(`${end_date} ${end_time}`).getTime()
+        // setButtonCreateStatus(false)
+        const response = await fetch('/api/tests', {
+            method: 'POST',
+            body: JSON.stringify({
+                'name': name,
+                'description': description,
+                'start_time': start_period,
+                'end_time': end_period
+            })
+        })
+        let data = await response.json()
+        console.log(data)
+    }
+    // Create test Modal
+    const [opened, {open, close}] = useDisclosure(false);
     // Set account info
     useEffect(() => {
         if (!props.sessionStatus)  {
@@ -104,6 +141,30 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
             <h3>User ID: {account_info.id}</h3>
             <h3>User role: {account_info.role}</h3> */}
             <Navbar />
+            <Modal opened={opened} onClose={close} title="Test Creation" centered>
+                <h2>Create a Test</h2>
+                <form className={styles.createTestForm} onSubmit={createTest}>
+                    <TextInput type="text" name="name" placeholder="Name" required/>
+                    <TextInput type="text" name="description" placeholder="Description" required/>
+                    <div className={styles.row_head}>
+                        <label htmlFor="start_date">Start Date</label>
+                        <TextInput type="date" name="start_date" required/>
+                    </div>
+                    <div className={styles.row_head}>
+                        <label htmlFor="start_time">Start Time</label>
+                        <TextInput type="time" name="start_time" required/>
+                    </div>
+                    <div className={styles.row_head}>
+                        <label htmlFor="end_date">End Date</label>
+                        <TextInput type="date" name="end_date" required/>
+                    </div>
+                    <div className={styles.row_head}>
+                        <label htmlFor="end_time">End Time</label>
+                        <TextInput type="time" name="end_time" required/>
+                    </div>
+                    {buttonCreateStatus ? <Button type="submit"><Loader style={{transform: 'scale(0.6)'}} color="white" /></Button> : <Button type="submit">Create</Button>}
+                </form>
+            </Modal>
             <main className={styles.content}>
                 <div className={styles.header}>
                     <h1><Paperclip /> Tests</h1>
@@ -111,7 +172,7 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
                 </div>
                 <div className={styles.testContainer}>
                     <div className={styles.createTest}>
-                        {(account_info?.role == 'owner' || account_info?.role == 'admin') ? (<Button className={styles.createButton}><span className={styles.textContent}><FilePlus />  Create a test</span></Button>) : null}
+                        {(account_info?.role == 'owner' || account_info?.role == 'admin') ? (<Button className={styles.createButton} onClick={open}><span className={styles.textContent}><FilePlus />  Create a test</span></Button>) : null}
                     </div>
                     <div className={styles.tests}>
                         {/* Do this later */}
