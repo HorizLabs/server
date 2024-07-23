@@ -79,6 +79,7 @@ export const getServerSideProps = (async (args: any) => {
 export default function Tests(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
     // Submit test creation
     let [buttonCreateStatus, setButtonCreateStatus] = useState<boolean>(false)
+    let [errorInfo, setErrorInfo] = useState<String>("")
     // @ts-ignore
     const createTest = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault()
@@ -109,7 +110,12 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
             })
         })
         let data = await response.json()
-        console.log(data)
+        if (data.coreStatus === 'CREATED_TEST') {
+            window.location.reload()
+        } else {
+            setErrorInfo(data.message)
+            setButtonCreateStatus(false)
+        }      
     }
     // Create test Modal
     const [opened, {open, close}] = useDisclosure(false);
@@ -143,6 +149,7 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
             <Navbar />
             <Modal opened={opened} onClose={close} title="Test Creation" centered>
                 <h2>Create a Test</h2>
+                {errorInfo != '' ? <p className={styles.information_error}>{errorInfo}</p>: null}
                 <form className={styles.createTestForm} onSubmit={createTest}>
                     <TextInput type="text" name="name" placeholder="Name" required/>
                     <TextInput type="text" name="description" placeholder="Description" required/>

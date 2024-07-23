@@ -17,7 +17,7 @@ export const tests = platform.table('platform_tests', {
     name: text('name'),
     description: text('description'),
     created_on: date('created_on').defaultNow(),
-    starts_on: text('end_by'),
+    starts_on: text('start_by'),
     ends_on: text('end_by'),
     test_status: text('test_status', {enum: ['draft', 'active', 'suspended', 'archived']}).default('draft'),
 })
