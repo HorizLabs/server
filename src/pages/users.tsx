@@ -8,8 +8,8 @@ import * as crypto from "crypto";
 import { InferGetServerSidePropsType } from "next";
 import Navbar from "@/components/Navbar";
 import styles from '@/styles/Users.module.css'
-import { FilePlus, Paperclip, UserPlus, Users } from "react-feather";
-import { Button,Loader,Modal, PasswordInput, TextInput } from "@mantine/core";
+import { FilePlus, Paperclip, UserPlus, Users, X } from "react-feather";
+import { Button,Loader,Modal, NativeSelect, PasswordInput, TextInput } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
 
 export const getServerSideProps = (async (args: any) => {  
@@ -59,7 +59,35 @@ export const getServerSideProps = (async (args: any) => {
 export default function UsersPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
     // Create states and modal
     const [accounts, setAccounts] = useState<any>(props?.accounts_info)
+    const [loadingButton, setLoadingButton] = useState<Boolean>(false)
+    const [errorInfo, setErrorInfo] = useState<String>('')
     const [opened, {open, close}] = useDisclosure(false);
+    const [cOpened, {opend, closed}] = useDisclosure(false);
+
+    // Create
+    const createAccount = async (event: any) => {
+        event.preventDefault();
+        setLoadingButton(true)
+        let [name, email, password, role] = [event.target.name.value, event.target.email.value, event.target.password.value, event.target.role.value]
+        let loweredRole = role.toLowerCase()
+        const response = await fetch('/api/users', {
+            'method': 'POST',
+            'body': JSON.stringify({
+                'name': name, 
+                'email': email,
+                'password': password,
+                'role': loweredRole
+            })
+        })
+        console.log(response)
+        let data = await response.json()
+        if (data.coreStatus === 'CREATED_ACCOUNT') {
+            window.location.reload()
+        } else {
+            setErrorInfo(data.message)
+            setLoadingButton(false)
+        }
+    }
 
     // Set account info
     useEffect(() => {
@@ -75,6 +103,12 @@ export default function UsersPage(props: InferGetServerSidePropsType<typeof getS
         )    
     }
 
+    const roleModify = (roleA: string, roleB: string) => {
+        let roles = ['staff', 'admin', 'owner']
+        let roleAIndex = roles.indexOf(roleA)
+        let roleBIndex = roles.indexOf(roleB)
+        return roleAIndex > roleBIndex
+    }
     console.log(props.accounts_info)
     let account_info = props.account
     return(
@@ -92,11 +126,16 @@ export default function UsersPage(props: InferGetServerSidePropsType<typeof getS
             <Navbar />
             <Modal opened={opened} onClose={close} title="Create a User" centered>
                 <h2>Create a User Account</h2>
-                <form className={styles.accountCreationForm}>
+                {(errorInfo != '') ? <p style={{color: 'red'}}>{errorInfo}</p>: null}
+                <form className={styles.accountCreationForm} onSubmit={createAccount}>
                     <TextInput type="text" name="name" placeholder="Name" label="Name" required />
                     <TextInput type="text" name="email" placeholder="Email" label="Email" required />
                     <PasswordInput type="text" name="password" placeholder="Password" label="Password" required />
+                    <NativeSelect label="Role" data={(account_info?.role == 'owner') ? ['Owner', 'Admin', 'Staff'] : ['Staff']} name="role" required/>
+                    {loadingButton ? <Button type="submit"><Loader color="white" style={{transform: 'scale(0.7)'}} /></Button>: <Button type="submit">Create Account</Button>}
                 </form>
+            </Modal>
+            <Modal opened={cOpened}>
             </Modal>
             <main className={styles.content}>
                 <div className={styles.header}>
@@ -142,6 +181,7 @@ export default function UsersPage(props: InferGetServerSidePropsType<typeof getS
                                 <th>Full Name</th>
                                 <th>Email</th>
                                 <th>Role</th>
+                                {(account_info?.role == 'owner' || account_info?.role == 'admin') ? <th>Actions</th> : null}
                             </tr>
                             {accounts?.map((account: any, id: any) => {
                                 return (
@@ -149,6 +189,13 @@ export default function UsersPage(props: InferGetServerSidePropsType<typeof getS
                                         <td>{account[0]}</td>
                                         <td>{account[1]}</td>
                                         <td>{account[2]}</td>
+                                        {(account_info?.role == 'owner' || account_info?.role == 'admin') ? (
+                                            <>
+                                                {
+                                                    roleModify(account_info.role, account[2]) ? <td><Button onClick={opend}>Modify</Button></td> : <td><X /></td>
+                                                }
+                                            </>
+                                        ) : null}
                                     </tr>
                                 )
                             })}

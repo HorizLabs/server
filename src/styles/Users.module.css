@@ -83,3 +83,14 @@
   width: 90%;
   margin: auto;
 }
+
+.accountCreationForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.creationFormRow {
+  display: flex;
+  gap: 1em;
+}
