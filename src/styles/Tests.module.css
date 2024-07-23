@@ -50,3 +50,13 @@
   display: flex;
   gap: 1em;
 }
+
+.test {
+  border-radius: 10px;
+  background-color: rgb(236, 236, 236);
+  max-width: 40%;
+  display: flex;
+  gap: 0.5em;
+  padding: 10px;
+  flex-direction: column;
+}

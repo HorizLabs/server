@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { db } from "@/db/db";
-import { account } from "@/db/schema";
+import { account, tests } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { useEffect, useState } from "react";
 import * as jwt from "jose";
@@ -39,33 +39,12 @@ export const getServerSideProps = (async (args: any) => {
                     props: {sessionStatus: false}
                 }
             }
-            // Time to provide supplementary information
-            if (account_info[0].role == 'owner') {
-                // Provide recommendations and recommended actions
-                let recommended_actions = []
-                if ((await db.select().from(account)).length == 1) {
-                    recommended_actions.push({
-                        action: 'Add users',
-                        description: 'Add users to the platform to be able to help manage and create tests.',
-                        link: '/users',
-                        icon: 'Users',
-                        color_gradient: 'linear-gradient(43deg, rgba(2,0,36,1) 0%, rgba(61,93,168,1) 26%, rgba(112,139,215,1) 48%, rgba(132,92,229,1) 72%, rgba(79,0,255,1) 100%)'
-                    })
-                }
-                
-                // Limit to 5 actions
-                if (recommended_actions.length > 5) {
-                    recommended_actions = recommended_actions.slice(0,5)
-                }
-                return {
-                    // Ternary operator for that determination
-                    props: {sessionStatus: true, account: account_info[0], recommended_actions: recommended_actions}
-                }
-            }
-            
+            // Get test info
+            const testInfo = await db.select().from(tests)
+
             return {
                 // Ternary operator for that determination
-                props: {sessionStatus: true, account: account_info[0]}
+                props: {sessionStatus: true, account: account_info[0], test_info: testInfo}
             }
         }
     } catch {
@@ -134,6 +113,7 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
     }
 
     let account_info = props.account
+    console.log(props.test_info)
     return(
         <>
             <Head>
@@ -181,8 +161,25 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
                     <div className={styles.createTest}>
                         {(account_info?.role == 'owner' || account_info?.role == 'admin') ? (<Button className={styles.createButton} onClick={open}><span className={styles.textContent}><FilePlus />  Create a test</span></Button>) : null}
                     </div>
+                    {/* <div className={styles.header}>
+                        <h2>Active Tests</h2>
+                        <hr />
+                    </div> */}
                     <div className={styles.tests}>
-                        {/* Do this later */}
+                        {(props?.test_info?.length != 0) ? (
+                            props?.test_info?.map((test, id) => {
+                                return (
+                                    <a className={styles.test} key={id} href={`/tests/${test.id}`}>
+                                        <h3>{test.name}</h3>
+                                        <p>Tag: {test.test_status?.toLocaleUpperCase()}</p>
+                                        {/* @ts-ignore */}
+                                        <h4>Starts on {new Date(parseInt(test.starts_on)).toLocaleDateString()} at {new Date(parseInt(test.starts_on)).toLocaleTimeString()}</h4>
+                                        {/* @ts-ignore */}
+                                        <h4>Ends on {new Date(parseInt(test.ends_on)).toLocaleDateString()} at {new Date(parseInt(test.ends_on)).toLocaleTimeString()}</h4>
+                                    </a>
+                                )
+                            })
+                        ): null}
                     </div>
                 </div>
             </main>
