@@ -149,7 +149,7 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
                         <label htmlFor="end_time">End Time</label>
                         <TextInput type="time" name="end_time" required/>
                     </div>
-                    {buttonCreateStatus ? <Button type="submit"><Loader style={{transform: 'scale(0.6)'}} color="white" /></Button> : <Button type="submit">Create</Button>}
+                    {buttonCreateStatus ? <Button><Loader style={{transform: 'scale(0.6)'}} color="white" /></Button> : <Button type="submit">Create</Button>}
                 </form>
             </Modal>
             <main className={styles.content}>
