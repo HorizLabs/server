@@ -1,3 +1,5 @@
+![horizon_dashboard](https://github.com/user-attachments/assets/7f3ec544-2431-418a-bf9f-c16261b22525)
+
 # 📓 Horizon TestA, the test-making and management platform created by Horizon Labs
 ## About TestA
 TestA is a test-creation and management platform shipped as a server created by Horizon Labs. It is designed to be a simple, easy-to-use, and efficent platform for creating tests and for individuals to be able to access and submit tests and is written in NextJS. The project utilizes the AGPL-3 license to be able to allow for you to learn and utilize the platform as standalone.
