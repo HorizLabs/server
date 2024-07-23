@@ -7,6 +7,12 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
+        const roleModify = (roleA: string, roleB: string) => {
+            let roles = ['staff', 'admin', 'owner']
+            let roleAIndex = roles.indexOf(roleA)
+            let roleBIndex = roles.indexOf(roleB)
+            return roleAIndex > roleBIndex
+        }    
         // Get data
         const data = JSON.parse(req.body)
         console.log(data)
@@ -20,6 +26,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             let updatedRole = data?.role.toLowerCase();
             // Create account salt
             let salt = crypto.randomBytes(32).toString('hex')
+            if (roleModify(accountInfo[0].role, updatedRole)) {
+                res.status(403).json({
+                    coreStatus: 'NOT_ALLOWED_CREATE_USER_HIGHER_ROLE',
+                    message: 'You are not allowed to create a user with a higher role than you.'
+                })
+                return;
+            }
             // Create hash
             let password = crypto.pbkdf2Sync(data.password, salt, 19847, 80, 'sha512').toString('hex')
             // Create account

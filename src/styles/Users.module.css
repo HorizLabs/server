@@ -90,7 +90,45 @@
   gap: 1em;
 }
 
+.accountModificationForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  width: 90%;
+  margin: auto;
+}
+
+.accountModificationRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 4em;
+}
+
+.accountModificationRow button {
+  width: 100%;
+}
+
 .creationFormRow {
   display: flex;
   gap: 1em;
+}
+
+.modalCore {
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(102, 51, 153, 0);
+  border: none;
+}
+.modal {
+  width: fit-content;
+  height: fit-content;
+  background-color: rgb(255, 255, 255);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+  padding: 1em;
+  border-radius: 10px;
+  width: 350px;
+  height: 500px;
 }

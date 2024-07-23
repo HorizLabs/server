@@ -9,10 +9,11 @@ import { InferGetServerSidePropsType } from "next";
 import Navbar from "@/components/Navbar";
 import styles from '@/styles/Users.module.css'
 import { FilePlus, Paperclip, UserPlus, Users, X } from "react-feather";
-import { Button,Loader,Modal, NativeSelect, PasswordInput, TextInput } from "@mantine/core";
+import { Button,Loader,Modal, NativeSelect, PasswordInput, PinInput, TextInput } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
 
 export const getServerSideProps = (async (args: any) => {  
+
     try {
         // Check to ensure that there is a cookie when the page is loaded.
         if (typeof args.req.cookies['token'] == 'undefined') {
@@ -41,14 +42,26 @@ export const getServerSideProps = (async (args: any) => {
             }
             // Get account info
             // @ts-ignore
-            const accountInfo = await db.select([account.name, account.email, account.role]).from(account)
-
+            const accountInfo = await db.select([account.name, account.email, account.role, account.id]).from(account)
+            if (args.query.length != 0 && args.query.account) {
+                let acc_id = args.query.account
+                let account_id_info = await db.select({
+                    name: account.name,
+                    email: account.email,
+                    role: account.role,
+                    id: account.id
+                }).from(account).where(eq(account.id, acc_id))
+                return {
+                    props: {sessionStatus: true, accountLoginStatus: false, account: account_info[0], account_id_info: account_id_info}
+                }
+            }
             return {
                 // Ternary operator for that determination
                 props: {sessionStatus: true, account: account_info[0], accounts_info: accountInfo}
             }
         }
-    } catch {
+    } catch (e) {
+        console.log(e)
         // Catch and attempt to logout 
         return {
             props: {sessionStatus: false}
@@ -62,8 +75,6 @@ export default function UsersPage(props: InferGetServerSidePropsType<typeof getS
     const [loadingButton, setLoadingButton] = useState<Boolean>(false)
     const [errorInfo, setErrorInfo] = useState<String>('')
     const [opened, {open, close}] = useDisclosure(false);
-    const [cOpened, {opend, closed}] = useDisclosure(false);
-
     // Create
     const createAccount = async (event: any) => {
         event.preventDefault();
@@ -102,15 +113,77 @@ export default function UsersPage(props: InferGetServerSidePropsType<typeof getS
             </Head>
         )    
     }
-
+    // Check role
     const roleModify = (roleA: string, roleB: string) => {
         let roles = ['staff', 'admin', 'owner']
         let roleAIndex = roles.indexOf(roleA)
         let roleBIndex = roles.indexOf(roleB)
         return roleAIndex > roleBIndex
     }
-    console.log(props.accounts_info)
     let account_info = props.account
+
+    // Quick check
+    if (props.account_id_info?.length != 0 && props.account_id_info != undefined) {
+            let account = props.account_id_info[0]
+            const [opened, {open, close}] = useDisclosure(false);
+            if (account.role == 'owner' || account.role == 'admin') {
+                return (
+                    <>
+                    <Head>
+                        <title>Horizon Labs</title>
+                        <meta name="description" content="Introducing Horizon." />
+                        <meta name="viewport" content="width=device-width, initial-scale=1" />
+                        <link rel="icon" href="/favicon.ico" />
+                    </Head>
+                    {/* <h2>Hello, {account_info.name}!</h2>
+                    <h3>Email: {account_info.email}</h3>
+                    <h3>User ID: {account_info.id}</h3>
+                    <h3>User role: {account_info.role}</h3> */}
+                    <Navbar />
+                    <Modal opened={opened} onClose={close} title="Confirmation" centered>
+                    <h2>Are you sure that you would like to delete this user account?</h2>
+                    <p>Please view this option carefully as you will be deleting a user account. Please confirm this before proceeding.</p>
+                    <br />
+                    <form className={styles.accountCreationForm} onSubmit={createAccount}>
+                        {loadingButton ? <Button type="submit"><Loader color="white" style={{transform: 'scale(0.7)'}} /></Button>: <Button type="submit">I confirm, delete this account.</Button>}
+                        </form>
+                    </Modal>
+
+                    <dialog id="modal" className={styles.modalCore}>
+                        <div className={styles.modal} id="modalContent">
+                        <h2>Modify User</h2>
+                        </div>
+                    </dialog>
+                    <main className={styles.content}>
+                        <div className={styles.header}>
+                            <h1><Users /> Users</h1>
+                            <hr />
+                        </div>
+                        <div className="userManagementContainer">
+                            <h1>Modify User</h1>
+                            <form className={styles.accountModificationForm}>
+                                <TextInput type="text" id="name" name="name" placeholder="Name" defaultValue={props.account_id_info[0].name} label="Name" required />
+                                <TextInput type="text" id="email" name="email" placeholder="Email" label="Email" defaultValue={props.account_id_info[0].email} required />
+                                <NativeSelect id="role" label="Role" data={(account_info?.role == 'owner') ? ['Owner', 'Admin', 'Staff'] : ['Staff']} name="role" required/>
+                                <div className={styles.accountModificationRow}>
+                                    <Button >Modify Account</Button>
+                                    <Button onClick={open} color="red">Delete Account</Button>
+                                </div>
+                            </form>
+                        </div>
+                    </main>
+                </>
+                )
+            } else {
+                return (
+                    <Head>
+                        <meta httpEquiv="refresh" content="0;url=/" />
+                    </Head>
+                )
+            }
+    }
+
+    // Normal rendering
     return(
         <>
             <Head>
@@ -135,8 +208,11 @@ export default function UsersPage(props: InferGetServerSidePropsType<typeof getS
                     {loadingButton ? <Button type="submit"><Loader color="white" style={{transform: 'scale(0.7)'}} /></Button>: <Button type="submit">Create Account</Button>}
                 </form>
             </Modal>
-            <Modal opened={cOpened}>
-            </Modal>
+            <dialog id="modal" className={styles.modalCore}>
+                <div className={styles.modal} id="modalContent">
+                   <h2>Modify User</h2>
+                </div>
+            </dialog>
             <main className={styles.content}>
                 <div className={styles.header}>
                     <h1><Users /> Users</h1>
@@ -192,7 +268,7 @@ export default function UsersPage(props: InferGetServerSidePropsType<typeof getS
                                         {(account_info?.role == 'owner' || account_info?.role == 'admin') ? (
                                             <>
                                                 {
-                                                    roleModify(account_info.role, account[2]) ? <td><Button onClick={opend}>Modify</Button></td> : <td><X /></td>
+                                                    roleModify(account_info.role, account[2]) ? <td><Button component="a" href={`/users?account=${account[3]}`}>Modify</Button></td> : <td><X /></td>
                                                 }
                                             </>
                                         ) : null}
