@@ -6,7 +6,6 @@ import { eq } from 'drizzle-orm'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    console.log(JSON.parse(req.body), req.method)
     if (req.method == 'DELETE') {
         try {
             const roleModify = (roleA: string, roleB: string) => {
@@ -17,7 +16,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }    
             // Get data
             const data = JSON.parse(req.body)
-            console.log(data)
             let cookie = await req.cookies['token']
             // @ts-ignore
             let info = await await (await jwt.jwtVerify(cookie, crypto.createSecretKey(process.env.JWT_SECRET, 'utf-8')));
@@ -47,7 +45,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 })
             }
         } catch (e) {
-            console.log(e)
             res.status(400).json({
                 coreStatus: 'ERROR',
                 message: 'An error has occurred.'
@@ -63,7 +60,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }    
             // Get data
             const data = JSON.parse(req.body)
-            console.log(data)
             let cookie = await req.cookies['token']
             // @ts-ignore
             let info = await await (await jwt.jwtVerify(cookie, crypto.createSecretKey(process.env.JWT_SECRET, 'utf-8')));
@@ -92,7 +88,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 })
             }
         } catch (e) {
-            console.log(e)
             res.status(400).json({
                 coreStatus: 'ERROR',
                 message: 'An error has occurred.'
@@ -108,7 +103,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }    
             // Get data
             const data = JSON.parse(req.body)
-            console.log(data)
             let cookie = await req.cookies['token']
             // @ts-ignore
             let info = await await (await jwt.jwtVerify(cookie, crypto.createSecretKey(process.env.JWT_SECRET, 'utf-8')));
@@ -141,7 +135,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 })
             }
         } catch (e) {
-            console.log(e)
             res.status(400).json({
                 coreStatus: 'ERROR',
                 message: 'An error has occurred.'

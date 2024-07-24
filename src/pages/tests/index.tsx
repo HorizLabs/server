@@ -8,7 +8,7 @@ import * as crypto from "crypto";
 import { InferGetServerSidePropsType } from "next";
 import Navbar from "@/components/Navbar";
 import styles from '@/styles/Tests.module.css'
-import { ArrowLeft, BarChart2, FilePlus, Key, Lock, Paperclip } from "react-feather";
+import { ArrowLeft, BarChart2, FilePlus, FileText, Key, Lock, Paperclip } from "react-feather";
 import { Button,Loader,Modal, TextInput } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
 
@@ -122,6 +122,26 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
     if (props.test_id != undefined && props.test_info[props.test_id-1] != undefined) {
         let id = props.test_id
         let test_info = props.test_info[props.test_id-1]
+        let status_colors = {
+            'draft': {
+                'color': 'white',
+                'background': '#376dc4'
+            },
+            'active': {
+                'color': 'white',
+                'background': '##1aa13e'
+            },
+            'suspended': {
+                'color': 'white',
+                'background': '##383838'
+            },
+            'archived': {
+                'color': 'white',
+                'background': '##c72442'
+            }
+        }
+        // @ts-ignore
+        let tagColorScheme = status_colors[test_info.test_status]
         return(
             <>
                 <Head>
@@ -141,28 +161,26 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
                             <p>{test_info.name}</p>
                         </div>
                         <div className={styles.testmore_header_actions}>
-                            <Button component="a" href={`/tests?test=${id}&access=true`}><span><Key /> Access</span></Button>
+                            
+                            <Button component="a" href={`/tests/question_bank?test=${id}`}><span><FileText /> Question Bank</span></Button>
                             <Button component="a" href={`/tests?test=${id}&results=true`}><span><BarChart2/> Results</span></Button>
                             <Button component="a" href={`/tests`}><span><ArrowLeft /> Back</span></Button>
                         </div>
                     </nav>
-                    <div className={styles.testContainer}>
-                        <p>BASIC INFORMATION</p>
-                        <h1>
-                            {test_info.name}
-                        </h1>
-                        <p>
-                            {test_info.description}
-                        </p>
-                        <h2>
-                            Starts on {new Date(parseInt(test_info.starts_on)).toLocaleDateString()} at {new Date(parseInt(test_info.starts_on)).toLocaleTimeString()}
-                        </h2>
-                        <h2>
-                            Ends on {new Date(parseInt(test_info.ends_on)).toLocaleDateString()} at {new Date(parseInt(test_info.ends_on)).toLocaleTimeString()}
-                        </h2>
-                        <h2>
-                            Status: {test_info.test_status}
-                        </h2>
+                    <div className={styles.testDescription}>
+                        <h1>{test_info.name}</h1>
+                        <h2>{test_info.description}</h2>
+                        <div className={styles.testDescription_dates}>
+                            {/* @ts-ignore */}
+                            <p>Starts on {new Date(parseInt(test_info.starts_on)).toLocaleDateString()} at {new Date(parseInt(test_info.starts_on)).toLocaleTimeString()}</p>
+                            {/* @ts-ignore */}
+                            <p>Ends on {new Date(parseInt(test_info.ends_on)).toLocaleDateString()} at {new Date(parseInt(test_info.ends_on)).toLocaleTimeString()}</p>
+                        </div>
+                        <p>Visibility Status: </p>
+                        <div className={styles.testDescription_tag} style={{color: tagColorScheme.color, backgroundColor: tagColorScheme.background}}>
+                            {/* @ts-ignore */}
+                            <p>{test_info.test_status?.charAt(0).toLocaleUpperCase() + test_info.test_status?.slice(1)}</p>
+                        </div>
                     </div>
                 </main>
             </>
