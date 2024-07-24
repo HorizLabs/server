@@ -87,7 +87,6 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
             </Head>
         )    
     }
-
     let account_info = props.account
     return(
         <>
@@ -105,7 +104,7 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
             <main className={styles.content}>
                 <h1>My dashboard</h1>
                 {/* @ts-ignore */}
-                {((props.recommended_actions.length > 0 && account_info.role == 'owner')) ? (<>
+                {((props.recommended_actions != undefined && props.recommended_actions.length > 0)) ? (<>
                     <div className={styles.actions}>
                         <h1>To do</h1>
                         <div className={styles.actionrow}>

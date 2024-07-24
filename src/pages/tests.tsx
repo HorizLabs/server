@@ -8,7 +8,7 @@ import * as crypto from "crypto";
 import { InferGetServerSidePropsType } from "next";
 import Navbar from "@/components/Navbar";
 import styles from '@/styles/Tests.module.css'
-import { FilePlus, Paperclip } from "react-feather";
+import { ArrowLeft, BarChart2, FilePlus, Key, Lock, Paperclip } from "react-feather";
 import { Button,Loader,Modal, TextInput } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
 
@@ -42,8 +42,13 @@ export const getServerSideProps = (async (args: any) => {
             // Get test info
             const testInfo = await db.select().from(tests)
 
+            if (args.query.test != undefined) {
+                let testInfo = await db.select().from(tests).where(eq(tests.id, parseInt(args.query.test)))
+                return {
+                    props: {sessionStatus: true, account: account_info[0], test_info: testInfo, test_id: parseInt(args.query.test)}
+                }
+            }
             return {
-                // Ternary operator for that determination
                 props: {sessionStatus: true, account: account_info[0], test_info: testInfo}
             }
         }
@@ -113,7 +118,57 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
     }
 
     let account_info = props.account
-    console.log(props.test_info)
+    // Diverge based on test ID
+    if (props.test_id != undefined && props.test_info[props.test_id-1] != undefined) {
+        let id = props.test_id
+        let test_info = props.test_info[props.test_id-1]
+        return(
+            <>
+                <Head>
+                    <title>Horizon Labs</title>
+                    <meta name="description" content="Introducing Horizon." />
+                    <meta name="viewport" content="width=device-width, initial-scale=1" />
+                    <link rel="icon" href="/favicon.ico" />
+                </Head>
+                {/* <h2>Hello, {account_info.name}!</h2>
+                <h3>Email: {account_info.email}</h3>
+                <h3>User ID: {account_info.id}</h3>
+                <h3>User role: {account_info.role}</h3> */}
+                <Navbar />
+                <main className={styles.content}>
+                    <nav className={styles.testmore_header}>
+                        <div className={styles.testmore_header_header}>
+                            <p>{test_info.name}</p>
+                        </div>
+                        <div className={styles.testmore_header_actions}>
+                            <Button component="a" href={`/tests?test=${id}&access=true`}><span><Key /> Access</span></Button>
+                            <Button component="a" href={`/tests?test=${id}&results=true`}><span><BarChart2/> Results</span></Button>
+                            <Button component="a" href={`/tests`}><span><ArrowLeft /> Back</span></Button>
+                        </div>
+                    </nav>
+                    <div className={styles.testContainer}>
+                        <p>BASIC INFORMATION</p>
+                        <h1>
+                            {test_info.name}
+                        </h1>
+                        <p>
+                            {test_info.description}
+                        </p>
+                        <h2>
+                            Starts on {new Date(parseInt(test_info.starts_on)).toLocaleDateString()} at {new Date(parseInt(test_info.starts_on)).toLocaleTimeString()}
+                        </h2>
+                        <h2>
+                            Ends on {new Date(parseInt(test_info.ends_on)).toLocaleDateString()} at {new Date(parseInt(test_info.ends_on)).toLocaleTimeString()}
+                        </h2>
+                        <h2>
+                            Status: {test_info.test_status}
+                        </h2>
+                    </div>
+                </main>
+            </>
+        )
+    }
+    // Normal test list
     return(
         <>
             <Head>
@@ -169,7 +224,7 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
                         {(props?.test_info?.length != 0) ? (
                             props?.test_info?.map((test, id) => {
                                 return (
-                                    <a className={styles.test} key={id} href={`/tests/${test.id}`}>
+                                    <a className={styles.test} key={id} href={`/tests?test=${test.id}`}>
                                         <h3>{test.name}</h3>
                                         <p>Tag: {test.test_status?.toLocaleUpperCase()}</p>
                                         {/* @ts-ignore */}
