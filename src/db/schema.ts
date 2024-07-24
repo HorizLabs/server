@@ -30,6 +30,7 @@ export const question_bank = platform.table('platform_question_bank', {
     multiple_choice: boolean('multiple_choice'),
     long_answer: boolean('long_answer'),
     short_answer: boolean('short_answer'),
+    points: serial('points'),
     options: text('options'),
     answer: text('answer'),
 })

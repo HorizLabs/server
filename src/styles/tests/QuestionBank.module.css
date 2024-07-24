@@ -65,3 +65,21 @@
   border-collapse: collapse;
   margin-top: 1em;
 }
+
+.testDescription_actions {
+  display: flex;
+  gap: 1em;
+}
+
+.testDescription_actions .questionController span {
+  display: flex;
+  gap: 0.25em;
+  align-items: center;
+  justify-content: center;
+}
+
+.createQuestion {
+  display: flex;
+  gap: 1em;
+  flex-direction: column;
+}

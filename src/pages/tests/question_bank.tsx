@@ -9,8 +9,9 @@ import { InferGetServerSidePropsType } from "next";
 import Navbar from "@/components/Navbar";
 import styles from '@/styles/tests/QuestionBank.module.css'
 import { ArrowLeft, BarChart2, FilePlus, FileText, Key, Lock, Paperclip } from "react-feather";
-import { Button,Loader,Modal, Table, TextInput } from "@mantine/core";
+import { Button,Loader,Modal, NativeSelect, NumberInput, Table, TextInput } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
+import { Question } from "@/components/Question";
 
 export const getServerSideProps = (async (args: any) => {  
     try {
@@ -54,7 +55,6 @@ export const getServerSideProps = (async (args: any) => {
             }
         }
     } catch (e) {
-        console.log(e)
         // Catch and attempt to logout 
         return {
             props: {sessionStatus: false}
@@ -85,8 +85,24 @@ export default function QBank(props: InferGetServerSidePropsType<typeof getServe
         let id = props.test_id
         let questionBank = props.questionBank
         let test_info = props.test_info[props.test_id-1]
-        console.log(questionBank)
-        return(
+        const createQuestion = async (e: any) => {
+            e.preventDefault();
+            let [question, points, question_type, question_options, question_answer] = [e.target.question.value, e.target.points.value, e.target.question_type.value, e.target.question_options.value, e.target.question_answer.value]
+            const res = await fetch('/api/tests/question_bank', {
+                method: 'POST',
+                body: JSON.stringify({
+                    question: question,
+                    points: points,
+                    question_type: question_type,
+                    question_options: question_options,
+                    question_answer: question_answer,
+                    test_id: id
+                })
+            })
+            let data = await res.json()
+        }
+        const [opened, { open, close }] = useDisclosure(false);
+        return (
             <>
                 <Head>
                     <title>Horizon Labs</title>
@@ -99,13 +115,40 @@ export default function QBank(props: InferGetServerSidePropsType<typeof getServe
                 <h3>User ID: {account_info.id}</h3>
                 <h3>User role: {account_info.role}</h3> */}
                 <Navbar />
+                <Modal opened={opened} onClose={close} title="Create Question" centered>
+                    <Modal.Body>
+                        <h1>Create Test Question</h1>
+                        <form className={styles.createQuestion} onSubmit={createQuestion}>
+                            <TextInput name="question" label="Question" placeholder="Question Content" required />
+                            <NumberInput name="points" label="Points" placeholder="Total Points for this Question" required />
+                            <NativeSelect name="question_type"  label="Question Type" description="What is the type of question that you will make the question?" data={['Multiple Choice', 'Short Answer', 'Long Answer']} onChange={
+                                (val) => {
+                                    let selected_option = val.target.value
+                                    const options_array = {
+                                        'Multiple Choice': 'multiple_choice',
+                                        'Short Answer': 'short_answer',
+                                        'Long Answer': 'long_answer'
+                                    }
+                                    // @ts-ignore
+                                    if (options_array[selected_option] == 'multiple_choice') {
+                                        (document.getElementById('question_option') as HTMLInputElement).disabled = false
+                                    } else {
+                                        (document.getElementById('question_option') as HTMLInputElement).disabled = true
+                                    }
+                                }
+                            } required />
+                            <TextInput name="question_options" label="Options" id="question_option" placeholder="Options seperated by a comma or a space"  required/>
+                            <TextInput name="question_answer" label="Answer" placeholder="Correct Answer for the Question" required />
+                            <Button type="submit">Create</Button>
+                        </form>
+                    </Modal.Body>
+                </Modal>
                 <main className={styles.content}>
                     <nav className={styles.testmore_header}>
                         <div className={styles.testmore_header_header}>
                             <p>{test_info.name} | Question Bank</p>
                         </div>
                         <div className={styles.testmore_header_actions}>
-                           
                             <Button component="a" href={`/tests?test=${id}`}><span><ArrowLeft /> Back</span></Button>
                         </div>
                     </nav>
@@ -116,6 +159,9 @@ export default function QBank(props: InferGetServerSidePropsType<typeof getServe
                             <p>Starts on {new Date(parseInt(test_info.starts_on)).toLocaleDateString()} at {new Date(parseInt(test_info.starts_on)).toLocaleTimeString()}</p>
                             {/* @ts-ignore */}
                             <p>Ends on {new Date(parseInt(test_info.ends_on)).toLocaleDateString()} at {new Date(parseInt(test_info.ends_on)).toLocaleTimeString()}</p>
+                        </div>
+                        <div className={styles.testDescription_actions}>
+                            <Button onClick={open} className={styles.questionController}><span><FilePlus /> Create Question</span></Button>
                         </div>
                         <h1>Question Bank</h1>  
                         <Table>
@@ -128,10 +174,7 @@ export default function QBank(props: InferGetServerSidePropsType<typeof getServe
                             <Table.Tbody>
                                {questionBank.map((question: any, id: any) => {
                                     return (
-                                        <Table.Tr key={id}>
-                                            <Table.Td>{question.id}</Table.Td>
-                                            <Table.Td>{question.question}</Table.Td>
-                                        </Table.Tr>
+                                        <Question question={question} id={id} />
                                     )
                                 })}                    
                             </Table.Tbody>
