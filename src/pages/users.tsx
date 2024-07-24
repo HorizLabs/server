@@ -125,8 +125,57 @@ export default function UsersPage(props: InferGetServerSidePropsType<typeof getS
     // Quick check
     if (props.account_id_info?.length != 0 && props.account_id_info != undefined) {
             let account = props.account_id_info[0]
+            let user_role = account.role
+            // @ts-ignore
+            user_role = user_role?.charAt(0).toUpperCase() + user_role?.slice(1)
+            const deleteAccount = async (event: any) => {
+                event.preventDefault();
+                setLoadingButton(true)
+                const response = await fetch('/api/users', {
+                    'method': 'DELETE',
+                    'body': JSON.stringify({
+                        'id': account.id
+                    })
+                })
+                let data = await response.json()
+                if (data.coreStatus === 'DELETED_ACCOUNT') {
+                    window.location.href = '/users'
+                } else {
+                    window.location.href = '/users'
+                }
+            }
+            // @ts-ignore
+            if (roleModify(account_info.role, account.role) == false) {
+                return (
+                    <Head>
+                        <meta httpEquiv="refresh" content="0;url=/users" />
+                    </Head>
+                )
+            }
             const [opened, {open, close}] = useDisclosure(false);
-            if (account.role == 'owner' || account.role == 'admin') {
+            // @ts-ignore
+            if (account_info.role == 'owner' || account_info.role == 'admin') {
+                const updateAccount = async (event: any) => {
+                    event.preventDefault();
+                    setLoadingButton(true)
+                    let [name, email, role] = [event.target.name.value, event.target.email.value, event.target.role.value]
+                    let loweredRole = role.toLowerCase()
+                    const response = await fetch('/api/users', {
+                        'method': 'PUT',
+                        'body': JSON.stringify({
+                            'name': name, 
+                            'email': email,
+                            'role': loweredRole,
+                            'id': account.id
+                        })
+                    })
+                    let data = await response.json()
+                    if (data.coreStatus === 'UPDATED_ACCOUNT') {
+                        window.location.href = '/users'
+                    } else {
+                        window.location.href = '/users'
+                    }
+                }
                 return (
                     <>
                     <Head>
@@ -144,8 +193,8 @@ export default function UsersPage(props: InferGetServerSidePropsType<typeof getS
                     <h2>Are you sure that you would like to delete this user account?</h2>
                     <p>Please view this option carefully as you will be deleting a user account. Please confirm this before proceeding.</p>
                     <br />
-                    <form className={styles.accountCreationForm} onSubmit={createAccount}>
-                        {loadingButton ? <Button type="submit"><Loader color="white" style={{transform: 'scale(0.7)'}} /></Button>: <Button type="submit">I confirm, delete this account.</Button>}
+                    <form className={styles.accountCreationForm} onSubmit={deleteAccount}>
+                        {loadingButton ? <Button  color="darkred"><Loader color="white"  style={{transform: 'scale(0.7)'}} /></Button>: <Button type="submit" color="red">I confirm, delete this account.</Button>}
                         </form>
                     </Modal>
 
@@ -161,12 +210,14 @@ export default function UsersPage(props: InferGetServerSidePropsType<typeof getS
                         </div>
                         <div className="userManagementContainer">
                             <h1>Modify User</h1>
-                            <form className={styles.accountModificationForm}>
+                            <form className={styles.accountModificationForm} onSubmit={updateAccount}>
+                                {/* @ts-ignore */}
                                 <TextInput type="text" id="name" name="name" placeholder="Name" defaultValue={props.account_id_info[0].name} label="Name" required />
+                                {/* @ts-ignore */}
                                 <TextInput type="text" id="email" name="email" placeholder="Email" label="Email" defaultValue={props.account_id_info[0].email} required />
-                                <NativeSelect id="role" label="Role" data={(account_info?.role == 'owner') ? ['Owner', 'Admin', 'Staff'] : ['Staff']} name="role" required/>
+                                <NativeSelect id="role" label="Role" data={(account_info?.role == 'owner') ? ['Owner', 'Admin', 'Staff'] : ['Staff']} defaultValue={user_role} name="role" required/>
                                 <div className={styles.accountModificationRow}>
-                                    <Button >Modify Account</Button>
+                                    <Button type="submit">Modify Account</Button>
                                     <Button onClick={open} color="red">Delete Account</Button>
                                 </div>
                             </form>
@@ -177,7 +228,7 @@ export default function UsersPage(props: InferGetServerSidePropsType<typeof getS
             } else {
                 return (
                     <Head>
-                        <meta httpEquiv="refresh" content="0;url=/" />
+                        <meta httpEquiv="refresh" content="0;url=/users" />
                     </Head>
                 )
             }
@@ -205,7 +256,7 @@ export default function UsersPage(props: InferGetServerSidePropsType<typeof getS
                     <TextInput type="text" name="email" placeholder="Email" label="Email" required />
                     <PasswordInput type="text" name="password" placeholder="Password" label="Password" required />
                     <NativeSelect label="Role" data={(account_info?.role == 'owner') ? ['Owner', 'Admin', 'Staff'] : ['Staff']} name="role" required/>
-                    {loadingButton ? <Button type="submit"><Loader color="white" style={{transform: 'scale(0.7)'}} /></Button>: <Button type="submit">Create Account</Button>}
+                    {loadingButton ? <Button><Loader color="white" style={{transform: 'scale(0.7)'}} /></Button>: <Button type="submit">Create Account</Button>}
                 </form>
             </Modal>
             <dialog id="modal" className={styles.modalCore}>
