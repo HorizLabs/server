@@ -21,16 +21,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     'name': data.name,
                     'starts_on': data.start_time,
                     'ends_on': data.end_time,
-                })
-                let settingConstraints = {
-                    allowRetakes: false
-                }
-                
+                }).returning()
                 await db.insert(testSettings).values({
-                    'test_id': s.id,
-                    'allow_retakes': false
+                    'test_id': s[0].id,
                 })
-                
+               
                 res.status(201).json({
                     coreStatus: 'CREATED_TEST',
                     message: 'Created Successfully'

@@ -90,7 +90,7 @@ export default function QBank(props: InferGetServerSidePropsType<typeof getServe
         let [loading, setLoading] = useState(false)
         let id = props.test_id
         let questionBank = props.questionBank
-        let test_info = props.test_info[props.test_id-1]
+        let test_info = props.test_info[0]
         const createQuestion = async (e: any) => {
             e.preventDefault();
             setLoading(true)

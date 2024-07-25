@@ -26,23 +26,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 if (data.name == 'publish_test') {
                     await db.update(tests).set({
                         'test_status': (data.status ? 'active' : 'draft')
-                    })
+                    }).where(eq(tests.id, data.test_id))
                 }
                 if (test_settings.length == 0) {
                     await db.insert(testSettings).values({
                         'test_id': data.test_id,
                         'allow_retakes': (data.status != undefined && data.name == 'allow_retakes' ? data.status : false),
-                        'test_status': (data.status != undefined && data.status && data.name == 'publish_test' ? 'active' : 'draft')
+                        'test_status': (data.status != undefined && data.status && data.name == 'publish_test' ? 'active' : 'draft'),
+                        'randomize_questions': (data.status != undefined && data.status && data.name == 'randomize_questions' ? data.status : test_settings[0].randomize_questions),
                     })
                 } else {
                     let settingConstraints = {
                         allowRetakes: (data.status != undefined && data.name == 'allow_retakes' ? data.status : test_settings[0].allow_retakes),
-                        visibility: (data.status != undefined && data.status && data.name == 'publish_test' ? 'active' : 'draft')
+                        visibility: (data.status != undefined && data.status && data.name == 'publish_test' ? 'active' : 'draft'),
+                        randomize_questions: (data.status != undefined && data.status && data.name == 'randomize_questions' ? data.status : test_settings[0].randomize_questions)
                     }
                     await db.update(testSettings).set({
                         'allow_retakes': settingConstraints.allowRetakes,
                         // @ts-ignore
-                        'test_status': settingConstraints.visibility
+                        'test_status': settingConstraints.visibility,
+                        'randomize_questions': settingConstraints.randomize_questions
                     }).where(eq(testSettings.test_id, data.test_id))
                 }
                 res.status(201).json({

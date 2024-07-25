@@ -166,8 +166,8 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
                             <p>{test_info.name}</p>
                         </div>
                         <div className={styles.testmore_header_actions}>
-                            
                             <Button component="a" href={`/tests/question_bank?test=${id}`}><span><FileText /> Question Bank</span></Button>
+                            <Button component="a" href={`/tests/question_bank?test=${id}`}><span><Key /> Access</span></Button>
                             <Button component="a" href={`/tests/settings?test=${id}`}><span><Settings/> Settings</span></Button>
                             <Button component="a" href={`/tests`}><span><ArrowLeft /> Back</span></Button>
                         </div>

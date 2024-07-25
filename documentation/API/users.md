@@ -1,4 +1,4 @@
-``/api/account```
+``/api/users```
 
 ### Basic Description and Overview
 
@@ -23,7 +23,7 @@ For security reasons, the password cannot be changed apart from being reset by t
 
 ### Methods and Actions
 
-- `POST` /api/account
+- `POST` /api/users
     - **Description**: Make an user
     - **Parameters**:
         - `name` name of the user
