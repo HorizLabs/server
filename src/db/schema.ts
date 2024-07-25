@@ -27,6 +27,7 @@ export const testSettings = platform.table('platform_test_settings', {
     id: serial('id').primaryKey(),
     test_id: serial('test_id').notNull(),
     allow_retakes: boolean('allow_retakes').default(false),
+    test_status: text('test_status', {enum: ['draft', 'active', 'suspended', 'archived']}).default('draft'),
 })
 
 export const question_bank = platform.table('platform_question_bank', {

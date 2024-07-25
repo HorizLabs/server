@@ -23,10 +23,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 //     'ends_on': data.end_time,
                 // }).where(eq(tests.id, data.id))
                 let test_settings = await db.select().from(testSettings).where(eq(testSettings.test_id,data.test_id))
+                if (data.name == 'publish_test') {
+                    await db.update(tests).set({
+                        'test_status': (data.status ? 'active' : 'draft')
+                    })
+                }
                 if (test_settings.length == 0) {
                     await db.insert(testSettings).values({
-                        'test_id': data.test_id
+                        'test_id': data.test_id,
+                        'allow_retakes': (data.status != undefined && data.name == 'allow_retakes' ? data.status : false),
+                        'test_status': (data.status != undefined && data.status && data.name == 'publish_test' ? 'active' : 'draft')
                     })
+                } else {
+                    let settingConstraints = {
+                        allowRetakes: (data.status != undefined && data.name == 'allow_retakes' ? data.status : test_settings[0].allow_retakes),
+                        visibility: (data.status != undefined && data.status && data.name == 'publish_test' ? 'active' : 'draft')
+                    }
+                    await db.update(testSettings).set({
+                        'allow_retakes': settingConstraints.allowRetakes,
+                        // @ts-ignore
+                        'test_status': settingConstraints.visibility
+                    }).where(eq(testSettings.test_id, data.test_id))
                 }
                 res.status(201).json({
                     coreStatus: 'UPDATED_TEST',

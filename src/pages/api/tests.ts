@@ -1,5 +1,5 @@
 import { db } from '@/db/db'
-import { account, tests } from '@/db/schema'
+import { account, tests, testSettings } from '@/db/schema'
 import * as jwt from 'jose'
 import * as crypto from 'crypto'
 import { eq } from 'drizzle-orm'
@@ -16,12 +16,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             // @ts-ignore
             let accountInfo = await db.select().from(account).where(eq(account.email, info.payload.email))
             if (accountInfo[0].role == 'owner' || accountInfo[0].role == 'admin') {
-                await db.insert(tests).values({
+                let s = await db.insert(tests).values({
                     'description': data.description,
                     'name': data.name,
                     'starts_on': data.start_time,
                     'ends_on': data.end_time,
                 })
+                let settingConstraints = {
+                    allowRetakes: false
+                }
+                
+                await db.insert(testSettings).values({
+                    'test_id': s.id,
+                    'allow_retakes': false
+                })
+                
                 res.status(201).json({
                     coreStatus: 'CREATED_TEST',
                     message: 'Created Successfully'

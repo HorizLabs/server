@@ -86,7 +86,7 @@ export default function QBank(props: InferGetServerSidePropsType<typeof getServe
 
     let account_info = props.account
     // Diverge based on test ID
-    if (props.test_id != undefined && props.test_info[props.test_id-1] != undefined) {
+    if (props.test_id != undefined && props.test_info[0] != undefined) {
         let [loading, setLoading] = useState(false)
         let id = props.test_id
         let questionBank = props.questionBank

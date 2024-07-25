@@ -124,9 +124,9 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
 
     let account_info = props.account
     // Diverge based on test ID
-    if (props.test_id != undefined && props.test_info[props.test_id-1] != undefined) {
+    if (props.test_id != undefined && props.test_info[0] != undefined) {
         let id = props.test_id
-        let test_info = props.test_info[props.test_id-1]
+        let test_info = props.test_info[0]
         let status_colors = {
             'draft': {
                 'color': 'white',
@@ -134,7 +134,7 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
             },
             'active': {
                 'color': 'white',
-                'background': '##1aa13e'
+                'background': '#1aa13e'
             },
             'suspended': {
                 'color': 'white',
