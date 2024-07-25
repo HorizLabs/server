@@ -82,11 +82,13 @@ export default function QBank(props: InferGetServerSidePropsType<typeof getServe
     let account_info = props.account
     // Diverge based on test ID
     if (props.test_id != undefined && props.test_info[props.test_id-1] != undefined) {
+        let [loading, setLoading] = useState(false)
         let id = props.test_id
         let questionBank = props.questionBank
         let test_info = props.test_info[props.test_id-1]
         const createQuestion = async (e: any) => {
             e.preventDefault();
+            setLoading(true)
             let [question, points, question_type, question_options, question_answer] = [e.target.question.value, e.target.points.value, e.target.question_type.value, e.target.question_options.value, e.target.question_answer.value]
             const res = await fetch('/api/tests/question_bank', {
                 method: 'POST',
@@ -100,6 +102,11 @@ export default function QBank(props: InferGetServerSidePropsType<typeof getServe
                 })
             })
             let data = await res.json()
+            if (data.coreStatus == 'SUCCESS') {
+                window.location.reload()
+            } else {
+
+            }
         }
         const [opened, { open, close }] = useDisclosure(false);
         return (
@@ -139,7 +146,7 @@ export default function QBank(props: InferGetServerSidePropsType<typeof getServe
                             } required />
                             <TextInput name="question_options" label="Options" id="question_option" placeholder="Options seperated by a comma or a space"  required/>
                             <TextInput name="question_answer" label="Answer" placeholder="Correct Answer for the Question" required />
-                            <Button type="submit">Create</Button>
+                            {loading ? <Button type="submit"><Loader color="white" style={{transform: 'scale(0.7)'}} /></Button> : <Button type="submit">Create</Button>}
                         </form>
                     </Modal.Body>
                 </Modal>
