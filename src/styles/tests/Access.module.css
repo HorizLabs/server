@@ -1,0 +1,78 @@
+.content {
+  display: flex;
+  gap: 1em;
+  flex: 1;
+  margin-left: 310px;
+  flex-direction: column;
+}
+.testmore_header {
+  width: 100.5%;
+  background-color: rgb(248, 248, 248);
+  transform: translateX(-9px);
+  height: 3em;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  box-shadow: 0 0 1px black;
+  justify-content: space-between;
+}
+
+.testmore_header_actions {
+  gap: 10px;
+  display: flex;
+}
+
+.testmore_header_actions a {
+  display: flex;
+  gap: 1em;
+  align-items: center;
+  justify-content: center;
+}
+
+.testmore_header_actions a span {
+  display: flex;
+  gap: 0.25em;
+  align-items: center;
+  justify-content: center;
+}
+
+.testDescription {
+  & {
+    display: flex;
+    gap: 0.5em;
+    flex-direction: column;
+    margin-left: 3em;
+    margin-top: 3em;
+  }
+  .big_head {
+    font-size: 4em;
+  }
+  .testDescription_dates {
+    display: flex;
+    gap: 1em;
+  }
+}
+
+.userTable {
+  border: 2px solid black;
+  border-collapse: collapse;
+  width: 90%;
+  margin: auto;
+}
+
+.userTable th {
+  border: 2px solid black;
+  padding: 5px;
+}
+
+.userTable td {
+  text-align: center;
+  border: 2px solid black;
+  padding: 5px;
+}
+
+.createCredentials {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}

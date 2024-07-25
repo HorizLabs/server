@@ -42,3 +42,11 @@ export const question_bank = platform.table('platform_question_bank', {
     options: text('options'),
     answer: text('answer'),
 })
+
+export const test_access = platform.table('platform_test_access', {
+    id: serial('id').primaryKey(),
+    test_id: serial('test_id'),
+    participant_name: text("participant_name"),
+    username: text("username"),
+    password: text("password"),
+})
