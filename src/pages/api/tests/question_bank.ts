@@ -20,8 +20,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 message: 'Creation has been denied.'
             })    
         }
-        console.log(data)
-        let s = '5 3'
         let cleanedOptions = await data.question_options.split(/, | /).toString()
         let cleanedAnswers = await data.question_answer.split(/, | /).toString()
         let questionTypes = {

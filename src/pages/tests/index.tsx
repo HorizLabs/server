@@ -8,7 +8,7 @@ import * as crypto from "crypto";
 import { InferGetServerSidePropsType } from "next";
 import Navbar from "@/components/Navbar";
 import styles from '@/styles/Tests.module.css'
-import { ArrowLeft, BarChart2, FilePlus, FileText, Key, Lock, Paperclip } from "react-feather";
+import { ArrowLeft, BarChart2, FilePlus, FileText, Key, Lock, Paperclip, Settings } from "react-feather";
 import { Button,Loader,Modal, TextInput } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
 
@@ -31,8 +31,13 @@ export const getServerSideProps = (async (args: any) => {
             // @ts-ignore
             let token_info = await (await jwt.jwtVerify(cookie, crypto.createSecretKey(process.env.JWT_SECRET, 'utf-8')));
             let email = token_info.payload?.email;
+            let account_info = await db.select({
+                id: account.id,
+                name: account.name,
+                email: account.email,
+                role: account.role
             // @ts-ignore
-            let account_info = await db.select().from(account).where(eq(account.email, email))
+            }).from(account).where(eq(account.email, email))
             if (account_info.length == 0) {
                 return {
                     // Ternary operator for that determination
@@ -163,7 +168,7 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
                         <div className={styles.testmore_header_actions}>
                             
                             <Button component="a" href={`/tests/question_bank?test=${id}`}><span><FileText /> Question Bank</span></Button>
-                            <Button component="a" href={`/tests?test=${id}&results=true`}><span><BarChart2/> Results</span></Button>
+                            <Button component="a" href={`/tests/settings?test=${id}`}><span><Settings/> Settings</span></Button>
                             <Button component="a" href={`/tests`}><span><ArrowLeft /> Back</span></Button>
                         </div>
                     </nav>

@@ -1,17 +1,19 @@
+// Styles
+import styles from '@/styles/tests/Settings.module.css'
+
+// Other imports
 import Head from "next/head";
 import { db } from "@/db/db";
-import { account, question_bank, tests } from "@/db/schema";
+import { account, tests } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import * as jwt from "jose";
 import * as crypto from "crypto";
 import { InferGetServerSidePropsType } from "next";
 import Navbar from "@/components/Navbar";
-import styles from '@/styles/tests/QuestionBank.module.css'
-import { ArrowLeft, BarChart2, FilePlus, FileText, Key, Lock, Paperclip } from "react-feather";
-import { Button,Loader,Modal, NativeSelect, NumberInput, Table, TextInput } from "@mantine/core";
+import { ArrowLeft, FilePlus } from "react-feather";
+import { Button,Loader,Modal, NativeSelect, NumberInput, PillsInput, Switch, Table, Textarea, TextInput } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
-import { Question } from "@/components/Question";
 
 export const getServerSideProps = (async (args: any) => {  
     try {
@@ -49,10 +51,10 @@ export const getServerSideProps = (async (args: any) => {
             const testInfo = await db.select().from(tests)
 
             if (args.query.test != undefined) {
+                // Get further test info and send it off
                 let testInfo = await db.select().from(tests).where(eq(tests.id, parseInt(args.query.test)))
-                let questionBank = await db.select().from(question_bank).where(eq(question_bank.test_id, parseInt(args.query.test)))
                 return {
-                    props: {sessionStatus: true, account: account_info[0], test_info: testInfo, test_id: parseInt(args.query.test), questionBank: questionBank}
+                    props: {sessionStatus: true, account: account_info[0], test_info: testInfo, test_id: parseInt(args.query.test)}
                 }
             }
             return {
@@ -68,8 +70,6 @@ export const getServerSideProps = (async (args: any) => {
 })
 
 export default function QBank(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
-    // Create test Modal
-    const [opened, {open, close}] = useDisclosure(false);
     // Set account info
     useEffect(() => {
         if (!props.sessionStatus)  {
@@ -86,34 +86,20 @@ export default function QBank(props: InferGetServerSidePropsType<typeof getServe
 
     let account_info = props.account
     // Diverge based on test ID
-    if (props.test_id != undefined && props.test_info[props.test_id-1] != undefined) {
-        let [loading, setLoading] = useState(false)
+    // @ts-ignore
+    if (props.test_id != undefined && props.test_info[props.test_id-1] != undefined && account_info.role == 'owner' || account_info.role == 'admin') {
+        // Button status
+        const [buttonCreateStatus, setButtonCreateStatus] = useState(false)
         let id = props.test_id
-        let questionBank = props.questionBank
+        // @ts-ignore
         let test_info = props.test_info[props.test_id-1]
-        const createQuestion = async (e: any) => {
-            e.preventDefault();
-            setLoading(true)
-            let [question, points, question_type, question_options, question_answer] = [e.target.question.value, e.target.points.value, e.target.question_type.value, e.target.question_options.value, e.target.question_answer.value]
-            const res = await fetch('/api/tests/question_bank', {
-                method: 'POST',
-                body: JSON.stringify({
-                    question: question,
-                    points: points,
-                    question_type: question_type,
-                    question_options: question_options,
-                    question_answer: question_answer,
-                    test_id: id
-                })
-            })
-            let data = await res.json()
-            if (data.coreStatus == 'SUCCESS') {
-                window.location.reload()
-            } else {
-
-            }
+        // Create test Modal
+        const [opened, {open, close}] = useDisclosure(false);
+        const editTest = async (event: FormEvent<HTMLFormElement>) => {
+            event.preventDefault()
+            setButtonCreateStatus(true)
         }
-        const [opened, { open, close }] = useDisclosure(false);
+        console.log(new Date(parseInt(test_info.starts_on)).toDateString())
         return (
             <>
                 <Head>
@@ -127,34 +113,36 @@ export default function QBank(props: InferGetServerSidePropsType<typeof getServe
                 <h3>User ID: {account_info.id}</h3>
                 <h3>User role: {account_info.role}</h3> */}
                 <Navbar />
-                <Modal opened={opened} onClose={close} title="Create Question" centered>
+                {/* Modal */}
+                <Modal opened={opened} onClose={close} title="Wizard" size={'md'} centered>
                     <Modal.Body>
-                        <h1>Create Test Question</h1>
-                        <form className={styles.createQuestion} onSubmit={createQuestion}>
-                            <TextInput name="question" label="Question" placeholder="Question Content" required />
-                            <NumberInput name="points" label="Points" placeholder="Total Points for this Question" required />
-                            <NativeSelect name="question_type"  label="Question Type" description="What is the type of question that you will make the question?" data={['Multiple Choice', 'Short Answer', 'Long Answer']} onChange={
-                                (val) => {
-                                    let selected_option = val.target.value
-                                    const options_array = {
-                                        'Multiple Choice': 'multiple_choice',
-                                        'Short Answer': 'short_answer',
-                                        'Long Answer': 'long_answer'
-                                    }
-                                    // @ts-ignore
-                                    if (options_array[selected_option] == 'multiple_choice') {
-                                        (document.getElementById('question_option') as HTMLInputElement).disabled = false
-                                    } else {
-                                        (document.getElementById('question_option') as HTMLInputElement).disabled = true
-                                    }
-                                }
-                            } required />
-                            <TextInput name="question_options" label="Options" id="question_option" placeholder="Options seperated by a comma or a space"  required/>
-                            <TextInput name="question_answer" label="Answer" placeholder="Correct Answer for the Question" required />
-                            {loading ? <Button type="submit"><Loader color="white" style={{transform: 'scale(0.7)'}} /></Button> : <Button type="submit">Create</Button>}
+                        <h2>Welcome to the Test Wizard</h2>
+                        <p>Use the wizard to edit the test with ease.</p>
+                        <form onSubmit={editTest} className={styles.editTest}>
+                            <br />
+                            <TextInput type="text" name="name" placeholder="Name" defaultValue={test_info.name} required/>
+                            <TextInput type="text" name="description" defaultValue={test_info.description} placeholder="Description" required/>
+                            <div className={styles.row_head}>
+                                <label htmlFor="start_date">Start Date</label>
+                                <TextInput type="date" defaultValue={'2024-07-25'} name="start_date" required/>
+                            </div>
+                            <div className={styles.row_head}>
+                                <label htmlFor="start_time">Start Time</label>
+                                <TextInput type="time" name="start_time" required/>
+                            </div>
+                            <div className={styles.row_head}>
+                                <label htmlFor="end_date">End Date</label>
+                                <TextInput type="date" name="end_date" required/>
+                            </div>
+                            <div className={styles.row_head}>
+                                <label htmlFor="end_time">End Time</label>
+                                <TextInput type="time" name="end_time" required/>
+                            </div>
+                            {buttonCreateStatus ? <Button><Loader style={{transform: 'scale(0.6)'}} color="white" /></Button> : <Button type="submit">Create</Button>}
                         </form>
                     </Modal.Body>
                 </Modal>
+                {/* Rest content */}
                 <main className={styles.content}>
                     <nav className={styles.testmore_header}>
                         <div className={styles.testmore_header_header}>
@@ -172,25 +160,19 @@ export default function QBank(props: InferGetServerSidePropsType<typeof getServe
                             {/* @ts-ignore */}
                             <p>Ends on {new Date(parseInt(test_info.ends_on)).toLocaleDateString()} at {new Date(parseInt(test_info.ends_on)).toLocaleTimeString()}</p>
                         </div>
-                        <div className={styles.testDescription_actions}>
-                            <Button onClick={open} className={styles.questionController}><span><FilePlus /> Create Question</span></Button>
+                        <div>
+                            <h1>Settings</h1>
+                            <p>Customize the test with these settings.</p>
                         </div>
-                        <h1>Question Bank</h1>  
-                        <Table>
-                            <Table.Thead>
-                                <Table.Tr>
-                                    <Table.Th>Question ID</Table.Th>
-                                    <Table.Th>Question</Table.Th>
-                                </Table.Tr>
-                            </Table.Thead>
-                            <Table.Tbody>
-                               {questionBank.map((question: any, id: any) => {
-                                    return (
-                                        <Question question={question} id={id} />
-                                    )
-                                })}                    
-                            </Table.Tbody>
-                        </Table>
+                        <h2>General</h2>
+                        <div className={styles.testContainer}>
+                            <div className={styles.testSettings}>
+                                <Switch onChange={(core: any) => {
+                                    console.log(core.target.checked)
+                                }}  label="Allow retakes" />
+                            </div>
+                            <Button onClick={open}>Open Test Wizard</Button>
+                        </div>
                     </div>
                 </main>
             </>

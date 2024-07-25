@@ -32,8 +32,13 @@ export const getServerSideProps = (async (args: any) => {
             // @ts-ignore
             let token_info = await (await jwt.jwtVerify(cookie, crypto.createSecretKey(process.env.JWT_SECRET, 'utf-8')));
             let email = token_info.payload?.email;
+            let account_info = await db.select({
+                id: account.id,
+                name: account.name,
+                email: account.email,
+                role: account.role
             // @ts-ignore
-            let account_info = await db.select().from(account).where(eq(account.email, email))
+            }).from(account).where(eq(account.email, email))
             if (account_info.length == 0) {
                 return {
                     // Ternary operator for that determination
