@@ -14,7 +14,7 @@ import Navbar from "@/components/Navbar";
 import { Activity, ArrowLeft, Eye, EyeOff } from "react-feather";
 import { Button, Loader, Modal, TextInput } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
-import { notifications } from '@mantine/notifications';
+import { RenderDownload } from '@/components/RenderDownload';
 
 export const getServerSideProps = (async (args: any) => {  
     try {
@@ -54,6 +54,8 @@ export const getServerSideProps = (async (args: any) => {
             if (args.query.test != undefined) {
                 let testInfo = await db.select().from(tests).where(eq(tests.id, parseInt(args.query.test)))
                 let accessInfo = await db.select().from(test_access).where(eq(test_access.test_id, parseInt(args.query.test)))
+                let download_id = parseInt(args.query.downloadID)
+                let local = 
                 return {
                     props: {sessionStatus: true, account: account_info[0], test_info: testInfo, test_id: parseInt(args.query.test), access_info: accessInfo}
                 }
@@ -91,10 +93,13 @@ export default function UserAccess(props: InferGetServerSidePropsType<typeof get
         // States
         let [buttonLoading, setButtonLoading] = useState(false)
         let [sError, setError] = useState('')
+        let [query, setQuery] = useState(props.access_info)
+
         // data info and flags
         let id = props.test_id
         let test_info = props.test_info[0]
         const [opened, {open, close}] = useDisclosure(false);
+
         // @ts-ignore
         const createAccessCredentials = async (event: FormEvent<HTMLFormElement>) => {
             event.preventDefault()
@@ -160,6 +165,26 @@ export default function UserAccess(props: InferGetServerSidePropsType<typeof get
                         <Button onClick={open} style={{width: 'fit-content'}}>Create Credentials</Button>
                         <h1>Access</h1>
                     </div>
+                    <TextInput label="Search" id='search_access' className={styles.searchAccess} placeholder='Participant ID, Participant Name, or by Username' onChange={(event: any) => {
+                        // @ts-ignore
+                        let query = (document.getElementById('search_access') as HTMLElement)?.value
+                        // @ts-ignore
+                        let sa = []
+                        if (query == '') {
+                            setQuery(props.access_info)
+                        } else {
+                            props.access_info.filter((ex: any) => {
+                                if (ex.id === parseInt(query) || ex.participant_name.includes(query)) {
+                                    sa.push(ex)
+                                }
+                            })
+                            if (sa.length == 0) {
+                                setQuery([])
+                            }
+                            // @ts-ignore
+                            setQuery(sa)
+                        }
+                    }} />
                     <table className={styles.userTable}>
                         <tbody>
                             <tr>
@@ -168,30 +193,13 @@ export default function UserAccess(props: InferGetServerSidePropsType<typeof get
                                 <th>Username</th>
                                 <th>Password</th>
                             </tr>
-                            {props.access_info != undefined ? props.access_info.map((user, id) => {
-                                let [passwordState, setPasswordState] = useState(false)
+                            {query.length != 0 ? query.map((user, id) => {
                                 return (
                                     <tr key={id}>
                                         <td>{user.id}</td>
                                         <td>{user.participant_name}</td>
                                         <td>{user.username}</td>
-                                        <td className={styles.password_credentials}><span id='password_hidden' style={{filter: 'blur(3px)', userSelect: 'none'}}>{'*'.repeat(30)}</span> {passwordState ? <a onClick={(event: any) => {
-                                            // @ts-ignore
-                                            let element = (document.getElementById('password_hidden') as HTMLSpanElement)
-                                            element.innerHTML = `${'*'.repeat(30)}`
-                                            element.style.filter = 'blur(3px)'
-                                            element.style.userSelect = 'none'
-                                            setPasswordState(false)
-                                        }}><EyeOff /></a> : <a onClick={(event: any) => {
-                                            // @ts-ignore
-                                            let element = (document.getElementById('password_hidden') as HTMLSpanElement)
-                                            // @ts-ignore
-                                            element.innerHTML = user.password
-                                            element.style.filter = 'blur(0px)'
-                                            element.style.userSelect = 'text'
-                                            setPasswordState(true)
-                                        }}><Eye /></a>}
-                                        </td>
+                                        <RenderDownload user={user} />
                                     </tr>
                                 )
                             }) : null}

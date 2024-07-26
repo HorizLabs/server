@@ -121,6 +121,7 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
                             <p>Ends on {new Date(parseInt(test_info.ends_on)).toLocaleDateString()} at {new Date(parseInt(test_info.ends_on)).toLocaleTimeString()}</p>
                         </div>
                         <h2>Scoring</h2>
+                        <TextInput label="Filter Entries" placeholder="Filter" className={styles.searchScores} />
                     </div>                 
                 </main>
             </>
