@@ -2,7 +2,7 @@
 
 ### Basic Description and Overview
 
-The endpoint is used to create tests. It requires the user token as a cookie called "token" for authentication. Only individuals who have roles "owner" and "admin" as of right now (7/22/2024) can create and update tests.
+The endpoint is used to create tests. It requires the user token as a cookie called "token" for authentication. Only individuals who have roles "owner" and "admin" as of right now (7/22/2024) can create, update, and delete tests.
 
 ### Methods and Actions
 
@@ -29,6 +29,19 @@ The endpoint is used to create tests. It requires the user token as a cookie cal
         - `start_time`: Start time of the test, in Unix time as seconds.
         - `end_time`: End time of the test, in Unix time as milliseconds.
         - `id`: ID of the test that is being updated
+    - **Returns**:
+        - coreStatus, message
+    - **Status**:
+        - Depends on the coreStatus and message, list are:
+            - coreStatus: 'UPDATED_TEST', message: 'Updated test information successfully'
+            - coreStatus: 'NOT_ALLOWED_ROLE', message: 'You are not allowed to update a test.'
+            - coreStatus: 'ERROR', message: 'An error has occurred.'\*
+
+- `DELETE` /api/tests
+    - **Description**: Delete tests and all content associated with a test.
+    - **Parameters**:
+        - `test_id`: ID of the test to be deleted
+        - `confirmation`: true or false for acknowledging that the content will be deleted
     - **Returns**:
         - coreStatus, message
     - **Status**:

@@ -15,6 +15,7 @@ import { ArrowLeft, FilePlus } from "react-feather";
 import { Button,Loader,Modal, NativeSelect, NumberInput, PillsInput, Switch, Table, Textarea, TextInput } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
+import DeleteTest from '@/components/DeleteTest';
 
 export const getServerSideProps = (async (args: any) => {  
     try {
@@ -211,6 +212,7 @@ export default function TestSettings(props: InferGetServerSidePropsType<typeof g
                                 <TextInput type="time" name="end_time" defaultValue={new Date(parseInt(test_info.ends_on)).toISOString().split('T')[1].split(':00.000Z')[0]} required/>
                             </div>
                             {buttonCreateStatus ? <Button type="submit"><Loader style={{transform: 'scale(0.6)'}} color="white" /></Button> : <Button type="submit">Edit Information</Button>}
+                            <DeleteTest test_id={id} />
                         </form>
                     </Modal.Body>
                 </Modal>
@@ -218,7 +220,7 @@ export default function TestSettings(props: InferGetServerSidePropsType<typeof g
                 <main className={styles.content}>
                     <nav className={styles.testmore_header}>
                         <div className={styles.testmore_header_header}>
-                            <p>{test_info.name} | Question Bank</p>
+                            <p>{test_info.name} | Settings</p>
                         </div>
                         <div className={styles.testmore_header_actions}>
                             <Button component="a" href={`/tests?test=${id}`}><span><ArrowLeft /> Back</span></Button>

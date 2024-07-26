@@ -11,7 +11,7 @@ import * as jwt from "jose";
 import * as crypto from "crypto";
 import { InferGetServerSidePropsType } from "next";
 import Navbar from "@/components/Navbar";
-import { ArrowLeft } from "react-feather";
+import { ArrowLeft, Eye, EyeOff } from "react-feather";
 import { Button, Loader, Modal, TextInput } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
@@ -168,9 +168,29 @@ export default function UserAccess(props: InferGetServerSidePropsType<typeof get
                                 <th>Password</th>
                             </tr>
                             {props.access_info != undefined ? props.access_info.map((user, id) => {
+                                let [passwordState, setPasswordState] = useState(false)
                                 return (
                                     <tr key={id}>
-
+                                        <td>{user.id}</td>
+                                        <td>{user.participant_name}</td>
+                                        <td>{user.username}</td>
+                                        <td className={styles.password_credentials}><span id='password_hidden' style={{filter: 'blur(3px)', userSelect: 'none'}}>{'*'.repeat(30)}</span> {passwordState ? <a onClick={(event: any) => {
+                                            // @ts-ignore
+                                            let element = (document.getElementById('password_hidden') as HTMLSpanElement)
+                                            element.innerHTML = `${'*'.repeat(30)}`
+                                            element.style.filter = 'blur(3px)'
+                                            element.style.userSelect = 'none'
+                                            setPasswordState(false)
+                                        }}><EyeOff /></a> : <a onClick={(event: any) => {
+                                            // @ts-ignore
+                                            let element = (document.getElementById('password_hidden') as HTMLSpanElement)
+                                            // @ts-ignore
+                                            element.innerHTML = user.password
+                                            element.style.filter = 'blur(0px)'
+                                            element.style.userSelect = 'text'
+                                            setPasswordState(true)
+                                        }}><Eye /></a>}
+                                        </td>
                                     </tr>
                                 )
                             }) : null}

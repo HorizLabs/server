@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     message: 'Your account does not exist.'
                 })
             } else {
-                let password = crypto.randomBytes(15)
+                let password = crypto.randomBytes(15).toString('hex')
                 let username = data.participant_name.replace(/\s/g, '').toLowerCase() + crypto.randomBytes(5).toString('hex') + data.test_id
                 // @ts-ignore
                 await db.insert(test_access).values({

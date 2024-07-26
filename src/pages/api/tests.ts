@@ -1,5 +1,5 @@
 import { db } from '@/db/db'
-import { account, tests, testSettings } from '@/db/schema'
+import { account, question_bank, test_access, tests, testSettings } from '@/db/schema'
 import * as jwt from 'jose'
 import * as crypto from 'crypto'
 import { eq } from 'drizzle-orm'
@@ -67,6 +67,42 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 res.status(403).json({
                     coreStatus: 'NOT_ALLOWED_ROLE',
                     message: 'You are not allowed to update a test.'
+                })
+            }
+        } catch (e) {
+            res.status(400).json({
+                coreStatus: 'ERROR',
+                message: 'An error has occurred.'
+            })
+        }
+    } else if (req.method == 'DELETE') {
+        try {
+            // Get data
+            const data = JSON.parse(req.body)
+            let cookie = await req.cookies['token']
+            // @ts-ignore
+            let info = await await (await jwt.jwtVerify(cookie, crypto.createSecretKey(process.env.JWT_SECRET, 'utf-8')));
+            // @ts-ignore
+            let accountInfo = await db.select().from(account).where(eq(account.email, info.payload.email))
+            if ((accountInfo[0].role == 'owner' || accountInfo[0].role == 'admin') && data.confirmation == true) {
+                await db.delete(tests).where(eq(tests.id, data.test_id))
+                await db.delete(testSettings).where(eq(testSettings.test_id, data.test_id))
+                await db.delete(test_access).where(eq(test_access.test_id, data.test_id))
+                await db.delete(question_bank).where(eq(test_access.test_id, data.test_id))
+
+                res.status(201).json({
+                    coreStatus: 'DELETED_TEST',
+                    message: 'Deleted test information successfully'
+                })
+            } else if (data.confirmation == false) {
+                res.status(403).json({
+                    coreStatus: 'CANNOT_DELETE',
+                    message: 'Confirmation has not been provided to delete the test.'
+                })
+            } else {
+                res.status(403).json({
+                    coreStatus: 'NOT_ALLOWED_ROLE',
+                    message: 'You are not allowed to delete a test.'
                 })
             }
         } catch (e) {
