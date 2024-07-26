@@ -238,7 +238,6 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
                 <div className={styles.testContainer}>
                     <div className={styles.createTest}>
                         {(account_info?.role == 'owner' || account_info?.role == 'admin') ? (<Button className={styles.createButton} onClick={open}><span className={styles.textContent}><FilePlus />  Create a test</span></Button>) : null}
-                                                {(account_info?.role == 'owner' || account_info?.role == 'admin') ? (<Button className={styles.createButton} onClick={open}><span className={styles.textContent}><FilePlus />  Create a test</span></Button>) : null}
                     </div>
                     {/* <div className={styles.header}>
                         <h2>Active Tests</h2>
