@@ -54,20 +54,6 @@ export const getServerSideProps = (async (args: any) => {
             if (args.query.test != undefined) {
                 let testInfo = await db.select().from(tests).where(eq(tests.id, parseInt(args.query.test)))
                 let accessInfo = await db.select().from(test_access).where(eq(test_access.test_id, parseInt(args.query.test)))
-                let download_id = parseInt(args.query.downloadID)
-                if (typeof download_id == 'number' && !isNaN(download_id)) {
-                    let local = await db.select().from(test_access).where(eq(test_access.id, download_id))
-                    return {
-                        props: {
-                            sessionStatus: true,
-                            account: account_info[0],
-                            test_info: testInfo,
-                            test_id: parseInt(args.query.test),
-                            access_info: accessInfo,
-                            download_credentials: local
-                        }
-                    }
-                }
                 return {
                     props: {sessionStatus: true, account: account_info[0], test_info: testInfo, test_id: parseInt(args.query.test), access_info: accessInfo}
                 }
@@ -86,13 +72,6 @@ export const getServerSideProps = (async (args: any) => {
 })
 
 export default function UserAccess(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
-
-    if (props.download_credentials != undefined && props.download_credentials.length != 0) {
-        return (
-            <>
-            </>
-        )
-    }
     // Set account info
     useEffect(() => {
         if (!props.sessionStatus)  {
@@ -211,7 +190,7 @@ export default function UserAccess(props: InferGetServerSidePropsType<typeof get
                                 <th>Participant ID</th>
                                 <th>Participant Name</th>
                                 <th>Username</th>
-                                <th>Password</th>
+                                <th>Access Cards</th>
                             </tr>
                             {query.length != 0 ? query.map((user, id) => {
                                 return (

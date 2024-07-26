@@ -1,6 +1,5 @@
 import { ImageResponse } from '@vercel/og';
 import { NextApiRequest } from 'next';
-import styles from '@/styles/content/Card.module.css'
 
 export const config = {
   runtime: 'edge',
@@ -19,11 +18,11 @@ export default async function (params: NextApiRequest) {
     let host_domain = await params.nextUrl.host
     // @ts-ignore
     let origin = await params.nextUrl.origin
-    return new ImageResponse(
+    // Make this downloadable
+    const image = new ImageResponse(
       (
         <div style={{
           display: 'flex',
-          fontFamily: 'Times New Roman',
           flexDirection: 'column',
           alignItems: 'center',
           width: '100%',
@@ -87,6 +86,8 @@ export default async function (params: NextApiRequest) {
         height: 600,
       },
     );
+    image.headers.set('Content-Disposition', `attachment; filename=${credentials[0].replace(/s/g, '')}_access_card.png`)
+    return image;
   } catch (e) {
     return new ImageResponse(
        <div style={{

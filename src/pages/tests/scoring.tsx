@@ -9,7 +9,7 @@ import { InferGetServerSidePropsType } from "next";
 import Navbar from "@/components/Navbar";
 import styles from '@/styles/Tests/Scoring.module.css'
 import { ArrowLeft, BarChart2, FilePlus, FileText, Key, Lock, Paperclip, Settings } from "react-feather";
-import { Button,Loader,Modal, TextInput } from "@mantine/core";
+import { Button,Loader,Modal, Table, TextInput } from "@mantine/core";
 
 export const getServerSideProps = (async (args: any) => {  
     try {
@@ -83,12 +83,14 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
         )    
     }
 
-    let account_info = props.account
     // Diverge based on test ID
     if (props.test_id != undefined && props.test_info[0] != undefined) {
         // const [submission, setSubmission] = useState(props.scoring_scores)
         let id = props.test_id
         let test_info = props.test_info[0]
+
+        // States
+        let [tableBody, setTableBody] = useState(props.scoring_scores)
         return(
             <>
                 <Head>
@@ -121,7 +123,43 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
                             <p>Ends on {new Date(parseInt(test_info.ends_on)).toLocaleDateString()} at {new Date(parseInt(test_info.ends_on)).toLocaleTimeString()}</p>
                         </div>
                         <h2>Scoring</h2>
-                        <TextInput label="Filter Entries" placeholder="Filter F" className={styles.searchScores} />
+                        <TextInput label="Filter Entries" placeholder="Filter Results by User ID or Question ID" className={styles.searchScores} onChange={(event: any) => {
+                            // Search
+                            let search = event.target.value
+                            // @ts-ignore
+                            let queries = []
+                            if (search == '') {
+                                setTableBody(props.scoring_scores)
+                            } else {
+                                props.scoring_scores.filter((submission: any) => {
+                                    if (submission.question_id == parseInt(search) || submission.participant_id == parseInt(search)) {
+                                        queries.push(submission)                                                                                                                      
+                                    }
+                                })
+                                // @ts-ignore
+                                setTableBody(queries)
+                            }
+                        }} />
+                        <Table className={styles.searchScores}>
+                            <Table.Thead>
+                                <Table.Tr>
+                                    <Table.Th>Taker ID</Table.Th>
+                                    <Table.Th>Question ID</Table.Th>
+                                    <Table.Th>Scoring Panel</Table.Th>                                    
+                                </Table.Tr>
+                            </Table.Thead>
+                            <Table.Tbody>
+                                {tableBody.map((question: any, id: any) => {
+                                    return (
+                                        <>
+                                            <Table.Tr key={id}>{question.participant_id}</Table.Tr>
+                                            <Table.Tr key={id}>{question.question_id}</Table.Tr>
+                                            <a>Open Panel?</a>
+                                        </>
+                                    )
+                                })}
+                            </Table.Tbody>
+                        </Table>
                     </div>                 
                 </main>
             </>
