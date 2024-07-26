@@ -1,4 +1,5 @@
 import styles from "@/styles/components/Navbar.module.css";
+import Link from "next/link";
 import { Box, Lock, LogOut, Paperclip, Settings, Users } from "react-feather";
 
 export default function Navbar() {
@@ -9,24 +10,21 @@ export default function Navbar() {
                 <h1>Horizon Labs</h1>
             </div>
             <div className={styles.sidebar__menu}>
-                <a className={styles.sidebar__content} href="/dashboard">
+                <Link className={styles.sidebar__content} href="/dashboard">
                     <Box /> Dashboard
-                </a>
-                <a className={styles.sidebar__content} href="/tests">
+                </Link>
+                <Link className={styles.sidebar__content} href="/tests">
                     <Paperclip /> Tests
-                </a>
-                <a className={styles.sidebar__content} href="/security">
-                    <Lock /> Security
-                </a>
-                <a className={styles.sidebar__content} href="/users">
+                </Link>
+                <Link className={styles.sidebar__content} href="/users">
                     <Users /> Users
-                </a>
+                </Link>
             </div>
             <div className={styles.sidebar__footer}>
                 <div>
-                    <a href="/settings" className={styles.outline}><Settings /></a>                    
+                    <Link href="/settings" className={styles.outline}><Settings /></Link>                    
                 </div>
-                <a href="/logout" className={styles.outline}><LogOut /></a>
+                <Link href="/logout" className={styles.outline}><LogOut /></Link>
             </div>
         </nav>
     )

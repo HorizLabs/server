@@ -65,9 +65,6 @@ export const getServerSideProps = (async (args: any) => {
 })
 
 export default function Tests(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
-    // Submit test creation
-    let [buttonCreateStatus, setButtonCreateStatus] = useState<boolean>(false)
-    let [errorInfo, setErrorInfo] = useState<String>("")
     // @ts-ignore
     // Set account info
     useEffect(() => {

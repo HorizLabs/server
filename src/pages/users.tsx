@@ -80,6 +80,7 @@ export default function UsersPage(props: InferGetServerSidePropsType<typeof getS
     const [loadingButton, setLoadingButton] = useState<Boolean>(false)
     const [errorInfo, setErrorInfo] = useState<String>('')
     const [opened, {open, close}] = useDisclosure(false);
+
     // Create
     const createAccount = async (event: any) => {
         event.preventDefault();
@@ -157,7 +158,6 @@ export default function UsersPage(props: InferGetServerSidePropsType<typeof getS
                     </Head>
                 )
             }
-            const [opened, {open, close}] = useDisclosure(false);
             // @ts-ignore
             if (account_info.role == 'owner' || account_info.role == 'admin') {
                 const updateAccount = async (event: any) => {

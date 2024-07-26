@@ -77,6 +77,11 @@ export const getServerSideProps = (async (args: any) => {
 })
 
 export default function TestSettings(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+    // Button status
+    const [buttonCreateStatus, setButtonCreateStatus] = useState(false)
+    const [errorInfo, setErrorInfo] = useState('')
+    const [opened, {open, close}] = useDisclosure(false);
+    
     // Set account info
     useEffect(() => {
         if (!props.sessionStatus)  {
@@ -95,15 +100,11 @@ export default function TestSettings(props: InferGetServerSidePropsType<typeof g
     // Diverge based on test ID
     // @ts-ignore
     if (props.test_id != undefined && props.test_info[0] != undefined && account_info.role == 'owner' || account_info.role == 'admin') {
-        // Button status
-        const [buttonCreateStatus, setButtonCreateStatus] = useState(false)
-        const [errorInfo, setErrorInfo] = useState('')
         // Parameters
         let id = props.test_id
         // @ts-ignore
         let test_info = props.test_info[0]
         // Create test Modal
-        const [opened, {open, close}] = useDisclosure(false);
         const editTest = async (event: FormEvent<HTMLFormElement>) => {
             event.preventDefault()
             setButtonCreateStatus(true)
