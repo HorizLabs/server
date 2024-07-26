@@ -7,7 +7,7 @@ export function RenderDownload(props: any) {
     let user = props.user
     return (
         <td>
-            <a href={`/tests/access?test=${user.test_id}&downloadID=${user.id}`} className={styles.downloadInformation}  >
+            <a href={`/api/access_card?name=${user.participant_name}&username=${user.username}&password=${user.password}`} className={styles.downloadInformation}  >
                 <Download color='black' />
             </a>
         </td>

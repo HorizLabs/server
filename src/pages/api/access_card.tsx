@@ -7,32 +7,93 @@ export const config = {
 };
  
 export default async function (params: NextApiRequest) {
-  let credentials = []
-  for (let i in await params.nextUrl.search.split('?')[1].split('&')) {
-    let info = await params.nextUrl.search.split('?')[1].split('&')[i]
-    credentials.push(info.split('=')[1].split('+').toString().replace(',',' '))
-  }
-  let host_domain = await params.nextUrl.host
-
-  return new ImageResponse(
-    (
-      <div className={styles.image}
-        style={{
-          width: '100%',
-          height: '100vh',
+  try {
+    let credentials = []
+    // @ts-ignore
+    for (let i in await params.nextUrl.search.split('?')[1].split('&')) {
+      // @ts-ignore
+      let info = await params.nextUrl.search.split('?')[1].split('&')[i]
+      credentials.push(info.split('=')[1].split('+').toString().replace(',',' '))
+    }
+    // @ts-ignore
+    let host_domain = await params.nextUrl.host
+    // @ts-ignore
+    let origin = await params.nextUrl.origin
+    return new ImageResponse(
+      (
+        <div style={{
           display: 'flex',
+          fontFamily: 'Times New Roman',
           flexDirection: 'column',
-        }}
-      >
-        <image  />
-        <p>Hello, {credentials[0]}!</p>
-        <p>You will need to log into your testing platform, which uses Horizon. The URL to go to on the application is</p>
-        <p>{host_domain}</p>
-      </div>
-    ),
-    {
-      width: 1200,
-      height: 600,
-    },
-  );
+          alignItems: 'center',
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'white',
+          justifyContent: 'center',
+        }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '20px',
+          }}>
+            <img src={`${origin}/logo.png`} alt='logo' width={50} height={50} />
+            <h2>Hello, {credentials[0]}!</h2>
+          </div>
+  
+          <p>Today is the day that you will be taking your test on the Horizon platform.</p>
+          <p style={{
+            fontSize: '15px',
+          }}>Once you are ready, you will need to open the Horizon app on your testing device and put this URL in when prompted:</p>
+          <p style={{
+             backgroundColor: 'gray',
+              color: 'white',
+              borderRadius: '10px',
+              padding: '10px',
+          }}>{host_domain}</p>
+          <p>Once you have entered that URL and have clicked enter, you will be prompted to enter your credentials:</p>
+          <div style={{
+            display: 'flex',
+          }}>
+            <p style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '10px',
+            }}>Username: <span style={{
+              backgroundColor: 'gray',
+              color: 'white',
+              borderRadius: '10px',
+              padding: '10px',
+            }}>{credentials[1]}</span></p>
+            <p style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '10px',
+              marginLeft: '20px',
+            }}>Password: <span style={{
+              backgroundColor: 'gray',
+              color: 'white',
+              borderRadius: '10px',
+              padding: '10px',
+            }}>{credentials[2]}</span></p>
+          </div>
+        </div>
+      ),
+      {
+        width: 1200,
+        height: 600,
+      },
+    );
+  } catch (e) {
+    return new ImageResponse(
+       <div style={{
+          display: 'flex',}}>
+          <h1>There was an error</h1>
+          <p>Could not generate the content.</p>
+          </div>
+      )
+  }
 }
