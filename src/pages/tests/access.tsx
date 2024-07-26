@@ -11,7 +11,7 @@ import * as jwt from "jose";
 import * as crypto from "crypto";
 import { InferGetServerSidePropsType } from "next";
 import Navbar from "@/components/Navbar";
-import { ArrowLeft, Eye, EyeOff } from "react-feather";
+import { Activity, ArrowLeft, Eye, EyeOff } from "react-feather";
 import { Button, Loader, Modal, TextInput } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
@@ -145,7 +145,8 @@ export default function UserAccess(props: InferGetServerSidePropsType<typeof get
                             <p>{test_info.name} | Access</p>
                         </div>
                         <div className={styles.testmore_header_actions}>
-                            <Button component="a" href={`/tests?test=${id}`}><span><ArrowLeft /> Back</span></Button>
+                            <Button component="a" color='black' href={`/tests/scoring?test=${id}`}><span><Activity /> Grading & Analytics</span></Button>
+                            <Button component="a" color='black' href={`/tests?test=${id}`}><span><ArrowLeft /> Back</span></Button>
                         </div>
                     </nav>
                     <div className={styles.testDescription}>

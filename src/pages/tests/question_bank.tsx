@@ -9,7 +9,7 @@ import { InferGetServerSidePropsType } from "next";
 import Navbar from "@/components/Navbar";
 import styles from '@/styles/tests/QuestionBank.module.css'
 import { ArrowLeft, BarChart2, FilePlus, FileText, Key, Lock, Paperclip } from "react-feather";
-import { Button,Loader,Modal, NativeSelect, NumberInput, Table, TextInput } from "@mantine/core";
+import { Button,Input,Loader,Modal, NativeSelect, NumberInput, Table, TextInput } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
 import { Question } from "@/components/Question";
 
@@ -89,8 +89,10 @@ export default function QBank(props: InferGetServerSidePropsType<typeof getServe
     if (props.test_id != undefined && props.test_info[0] != undefined) {
         let [loading, setLoading] = useState(false)
         let id = props.test_id
-        let questionBank = props.questionBank
         let test_info = props.test_info[0]
+        // Create test state for searching
+        let [query, setQuery] = useState(props.questionBank)
+
         const createQuestion = async (e: any) => {
             e.preventDefault();
             setLoading(true)
@@ -161,7 +163,7 @@ export default function QBank(props: InferGetServerSidePropsType<typeof getServe
                             <p>{test_info.name} | Question Bank</p>
                         </div>
                         <div className={styles.testmore_header_actions}>
-                            <Button component="a" href={`/tests?test=${id}`}><span><ArrowLeft /> Back</span></Button>
+                            <Button color='black' component="a" href={`/tests?test=${id}`}><span><ArrowLeft /> Back</span></Button>
                         </div>
                     </nav>
                     <div className={styles.testDescription}>
@@ -176,21 +178,43 @@ export default function QBank(props: InferGetServerSidePropsType<typeof getServe
                             <Button onClick={open} className={styles.questionController}><span><FilePlus /> Create Question</span></Button>
                         </div>
                         <h1>Question Bank</h1>  
-                        <Table>
-                            <Table.Thead>
-                                <Table.Tr>
-                                    <Table.Th>Question ID</Table.Th>
-                                    <Table.Th>Question</Table.Th>
-                                </Table.Tr>
-                            </Table.Thead>
-                            <Table.Tbody>
-                               {questionBank.map((question: any, id: any) => {
-                                    return (
-                                        <Question question={question} id={id} />
-                                    )
-                                })}                    
-                            </Table.Tbody>
-                        </Table>
+                        <div>
+                            <p>Search</p>
+                            <div className={styles.query_table}>
+                            <Input placeholder="Search for a question by ID, content, or by amount of points" onChange={(event: any) => {
+                                // Search query
+                                let search = event.target.value
+                                // @ts-ignore
+                                let list = []
+                                if (search == '') {
+                                    setQuery(props.questionBank)
+                                } else {
+                                    props.questionBank.filter((question: any) => {
+                                        if (question.id == parseInt(search) || question.question.includes(search) || question.points == parseInt(search)) {
+                                            list.push(question)
+                                        }
+                                    })
+                                    // @ts-ignore
+                                    setQuery(list)
+                                }
+                            }}/>
+                            <Table>
+                                <Table.Thead>
+                                    <Table.Tr>
+                                        <Table.Th>Question ID</Table.Th>
+                                        <Table.Th>Question</Table.Th>
+                                    </Table.Tr>
+                                </Table.Thead>
+                                <Table.Tbody>
+                                {query.map((question: any, id: any) => {
+                                        return (
+                                            <Question question={question} id={id} />
+                                        )
+                                    })}                    
+                                </Table.Tbody>
+                            </Table>
+                        </div>
+                        </div>
                     </div>
                 </main>
             </>

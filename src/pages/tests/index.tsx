@@ -9,7 +9,7 @@ import { InferGetServerSidePropsType } from "next";
 import Navbar from "@/components/Navbar";
 import styles from '@/styles/Tests.module.css'
 import { ArrowLeft, BarChart2, FilePlus, FileText, Key, Lock, Paperclip, Settings } from "react-feather";
-import { Button,Loader,Modal, TextInput } from "@mantine/core";
+import { Button,Loader,Modal, NumberInput, TextInput } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
 
 export const getServerSideProps = (async (args: any) => {  
@@ -78,13 +78,15 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
             start_date,
             start_time,
             end_date,
-            end_time
+            end_time,
+            questions
         ] = [event.target.name.value, 
             event.target.description.value,
             event.target.start_date.value,
             event.target.start_time.value,
             event.target.end_date.value,
-            event.target.end_time.value
+            event.target.end_time.value,
+            event.target.questions.value
         ]
         let start_period = new Date(`${start_date} ${start_time}`).getTime()
         let end_period = new Date(`${end_date} ${end_time}`).getTime()
@@ -95,7 +97,8 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
                 'name': name,
                 'description': description,
                 'start_time': start_period,
-                'end_time': end_period
+                'end_time': end_period,
+                'questions': questions
             })
         })
         let data = await response.json()
@@ -166,10 +169,10 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
                             <p>{test_info.name}</p>
                         </div>
                         <div className={styles.testmore_header_actions}>
-                            <Button component="a" href={`/tests/question_bank?test=${id}`}><span><FileText /> Question Bank</span></Button>
-                            <Button component="a" href={`/tests/access?test=${id}`}><span><Key /> Access</span></Button>
-                            <Button component="a" href={`/tests/settings?test=${id}`}><span><Settings/> Settings</span></Button>
-                            <Button component="a" href={`/tests`}><span><ArrowLeft /> Back</span></Button>
+                            <Button color='black' component="a" href={`/tests/question_bank?test=${id}`}><span><FileText /> Question Bank</span></Button>
+                            <Button color='black' component="a" href={`/tests/access?test=${id}`}><span><Key /> Access</span></Button>
+                            <Button color='black' component="a" href={`/tests/settings?test=${id}`}><span><Settings/> Settings</span></Button>
+                            <Button color='black' component="a" href={`/tests`}><span><ArrowLeft /> Back</span></Button>
                         </div>
                     </nav>
                     <div className={styles.testDescription}>
@@ -211,6 +214,7 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
                 <form className={styles.createTestForm} onSubmit={createTest}>
                     <TextInput type="text" name="name" placeholder="Name" required/>
                     <TextInput type="text" name="description" placeholder="Description" required/>
+                    <NumberInput name="questions" min={1} placeholder="Number of Questions" required/>
                     <div className={styles.row_head}>
                         <label htmlFor="start_date">Start Date</label>
                         <TextInput type="date" name="start_date" required/>

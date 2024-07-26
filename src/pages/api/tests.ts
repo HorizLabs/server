@@ -21,6 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     'name': data.name,
                     'starts_on': data.start_time,
                     'ends_on': data.end_time,
+                    'questionCount': data.questions
                 }).returning()
                 await db.insert(testSettings).values({
                     'test_id': s[0].id,
@@ -57,6 +58,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     'name': data.name,
                     'starts_on': data.start_time,
                     'ends_on': data.end_time,
+                    'questionCount': data.questions,
                 }).where(eq(tests.id, data.id))
 
                 res.status(201).json({

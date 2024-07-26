@@ -76,7 +76,7 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
             {!props.accountCreationStatus ? <input type="text" name="name" placeholder="Name" required/>: null}
             <input type="email" name="email" placeholder="Email" required/>
             <input type="password" name="password" placeholder="Password" required/>
-            {buttonStatus ? <button><Loader color="blue" /></button>: <button type="submit">{props.accountCreationStatus ? 'Login' : 'Create Account'}</button>}
+            {buttonStatus ? <button><Loader color="black" style={{transform: 'scale(0.7)'}} /></button>: <button type="submit">{props.accountCreationStatus ? 'Login' : 'Create Account'}</button>}
           </form>
         </div>
       </main>

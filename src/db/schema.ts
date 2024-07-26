@@ -20,6 +20,7 @@ export const tests = platform.table('platform_tests', {
     created_on: date('created_on').defaultNow(),
     starts_on: text('start_by'),
     ends_on: text('end_by'),
+    questionCount: serial('question_count'),
     test_status: text('test_status', {enum: ['draft', 'active', 'suspended', 'archived']}).default('draft'),
 })
 
@@ -49,4 +50,13 @@ export const test_access = platform.table('platform_test_access', {
     participant_name: text("participant_name"),
     username: text("username"),
     password: text("password"),
+})
+
+export const questionSubmission = platform.table('platform_question_submission', {
+    id: serial('id').primaryKey(),
+    test_id: serial('test_id'),
+    participant_id: serial('participant_id'),
+    question_id: serial('question_id'),
+    response: text('question_response'),
+    points_awarded: serial('points')
 })

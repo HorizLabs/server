@@ -115,7 +115,9 @@ export default function TestSettings(props: InferGetServerSidePropsType<typeof g
                 // @ts-ignore
                 start_period: new Date(`${event.target?.start_date?.value} ${event.target?.start_time?.value}`).getTime(),
                 // @ts-ignore
-                end_period: new Date(`${event.target?.end_date?.value} ${event.target?.end_time?.value}`).getTime(),        
+                end_period: new Date(`${event.target?.end_date?.value} ${event.target?.end_time?.value}`).getTime(),
+                // @ts-ignore
+                questions: event.target.questions.value
             }
             let res = await fetch('/api/tests', {
                 'method': 'PUT',
@@ -124,6 +126,7 @@ export default function TestSettings(props: InferGetServerSidePropsType<typeof g
                     'description': data.description,
                     'start_time': data.start_period,
                     'end_time': data.end_period,
+                    'questions': data.questions,
                     'id': props.test_id
                 })
             })
@@ -191,6 +194,7 @@ export default function TestSettings(props: InferGetServerSidePropsType<typeof g
                             <TextInput type="text" name="name" placeholder="Name" defaultValue={test_info.name} required/>
                             {/* @ts-ignore */}
                             <TextInput type="text" name="description" defaultValue={test_info.description} placeholder="Description" required/>
+                            <NumberInput name="questions" min={1} defaultValue={test_info.questionCount} placeholder="Number of Questions" required/>
                             <div className={styles.row_head}>
                                 <label htmlFor="start_date">Start Date</label>
                                 {/* @ts-ignore */}
@@ -223,7 +227,7 @@ export default function TestSettings(props: InferGetServerSidePropsType<typeof g
                             <p>{test_info.name} | Settings</p>
                         </div>
                         <div className={styles.testmore_header_actions}>
-                            <Button component="a" href={`/tests?test=${id}`}><span><ArrowLeft /> Back</span></Button>
+                            <Button color='black' component="a" href={`/tests?test=${id}`}><span><ArrowLeft /> Back</span></Button>
                         </div>
                     </nav>
                     <div className={styles.testDescription}>
