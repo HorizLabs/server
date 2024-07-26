@@ -55,7 +55,19 @@ export const getServerSideProps = (async (args: any) => {
                 let testInfo = await db.select().from(tests).where(eq(tests.id, parseInt(args.query.test)))
                 let accessInfo = await db.select().from(test_access).where(eq(test_access.test_id, parseInt(args.query.test)))
                 let download_id = parseInt(args.query.downloadID)
-                let local = 
+                if (typeof download_id == 'number' && !isNaN(download_id)) {
+                    let local = await db.select().from(test_access).where(eq(test_access.id, download_id))
+                    return {
+                        props: {
+                            sessionStatus: true,
+                            account: account_info[0],
+                            test_info: testInfo,
+                            test_id: parseInt(args.query.test),
+                            access_info: accessInfo,
+                            download_credentials: local
+                        }
+                    }
+                }
                 return {
                     props: {sessionStatus: true, account: account_info[0], test_info: testInfo, test_id: parseInt(args.query.test), access_info: accessInfo}
                 }
@@ -65,14 +77,22 @@ export const getServerSideProps = (async (args: any) => {
             }
         }
     } catch (e) {
+        console.log(e)
         // Catch and attempt to logout 
         return {
-            props: {sessionStatus: false}
+            props: {sessionStatus: true}
         }
     }
 })
 
 export default function UserAccess(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+
+    if (props.download_credentials != undefined && props.download_credentials.length != 0) {
+        return (
+            <>
+            </>
+        )
+    }
     // Set account info
     useEffect(() => {
         if (!props.sessionStatus)  {
