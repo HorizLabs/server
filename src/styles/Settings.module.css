@@ -12,3 +12,33 @@
 .content_column {
   margin-left: 21%;
 }
+
+.pfp_image {
+  border-radius: 100%;
+}
+
+.management_column {
+  & {
+    display: flex;
+    gap: 1em
+  }
+  a {
+    background-color: rgb(224, 224, 224);
+    border-radius: 10px;
+    padding: 1em;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: 350ms;
+    cursor: pointer;
+    user-select: none;
+  }
+  a:hover {
+    background-color: rgb(204, 204, 204);
+  }
+  a:focus {
+    background-color: rgb(160, 160, 160);
+  }
+}

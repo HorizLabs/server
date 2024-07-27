@@ -14,6 +14,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, Hexagon } from 'react-feather';
 import { SettingsSidebar } from '@/components/SettingsSidebar';
+import { AccountManagement } from '@/components/AccountManagement';
 
 export const getServerSideProps = (async (args: any) => {  
     try {
@@ -108,8 +109,20 @@ export default function Settings(props: InferGetServerSidePropsType<typeof getSe
                     <div className={styles.header}>
                         <h2 style={{display: 'flex', alignItems: 'center', gap: 5}}><Hexagon /> Identity</h2>
                     </div>
-                    <div>
-                        <p>Name: {account_info?.name}</p>
+                    <div style={{
+                        display: 'flex',
+                        gap: '3em'
+                    }}>
+                        <div style={{
+                            gap: '1em',
+                            display: 'flex',
+                            flexDirection: 'column'
+                        }}>
+                            <p>Name: {account_info?.name}</p>
+                            <p>Email: {account_info?.email}</p>
+                            <AccountManagement id={account_info?.id} role={account_info?.role} />
+                        </div>
+                        <Image className={styles.pfp_image} src={`/api/profile_icon?name=${account_info?.name}`} width={150} height={150} alt='profile_always_changes' />
                     </div>
                 </section>
             </main>

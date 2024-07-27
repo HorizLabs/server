@@ -7,7 +7,7 @@ import Head from 'next/head';
 
 export default function App({ Component, pageProps }: AppProps) {
   if (typeof window !== 'undefined') {
-    if (window.innerWidth < 900) {
+    if (window.innerWidth < 500) {
         return (
             <>
                 <Head>
