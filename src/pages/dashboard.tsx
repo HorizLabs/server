@@ -8,6 +8,7 @@ import * as crypto from "crypto";
 import { InferGetServerSidePropsType } from "next";
 import Navbar from "@/components/Navbar";
 import styles from '@/styles/Dashboard.module.css'
+import Link from "next/link";
 
 export const getServerSideProps = (async (args: any) => {  
     try {
@@ -116,7 +117,7 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
                             {
                                 props.recommended_actions?.map((action, index) => {
                                     return (
-                                        <a key={index} href={action.link} className={styles.action}>
+                                        <Link key={index} href={action.link} className={styles.action}>
                                             <div style={{'background': action.color_gradient, 'height': '75px', 'borderRadius': '10px'}}>
                                             </div>
                                             <div className={styles.action_header}>
@@ -126,7 +127,7 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
                                             <div className={styles.action_body}>
                                                 <p>{action.description}</p>
                                             </div>
-                                        </a>
+                                        </Link>
                                     )
                                 })
                             }

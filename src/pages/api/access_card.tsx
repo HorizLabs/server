@@ -18,7 +18,6 @@ export default async function (params: NextApiRequest) {
     let host_domain = await params.nextUrl.host
     // @ts-ignore
     let origin = await params.nextUrl.origin
-    // Make this downloadable
     const image = new ImageResponse(
       (
         <div style={{

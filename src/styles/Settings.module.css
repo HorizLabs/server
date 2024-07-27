@@ -5,8 +5,10 @@
   justify-content: space-between;
 }
 
-.contentTitle {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
+.content {
+  display: block;
+}
+
+.content_column {
+  margin-left: 21%;
 }

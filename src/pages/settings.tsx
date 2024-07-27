@@ -12,7 +12,8 @@ import * as crypto from "crypto";
 import { InferGetServerSidePropsType } from "next";
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft } from 'react-feather';
+import { ArrowLeft, Hexagon } from 'react-feather';
+import { SettingsSidebar } from '@/components/SettingsSidebar';
 
 export const getServerSideProps = (async (args: any) => {  
     try {
@@ -102,11 +103,15 @@ export default function Settings(props: InferGetServerSidePropsType<typeof getSe
                 </div>
             </nav>
             <main className={styles.content}>
-                <div className={styles.contentTitle}>
-                    <h1>Settings</h1>
-                </div>
-                <p>Hello!</p>
-                {/* @ts-ignore */}
+               <SettingsSidebar />
+                <section id='name' className={styles.content_column}>
+                    <div className={styles.header}>
+                        <h2 style={{display: 'flex', alignItems: 'center', gap: 5}}><Hexagon /> Identity</h2>
+                    </div>
+                    <div>
+                        <p>Name: {account_info?.name}</p>
+                    </div>
+                </section>
             </main>
         </>
     )
