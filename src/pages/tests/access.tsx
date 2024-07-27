@@ -201,7 +201,7 @@ export default function UserAccess(props: InferGetServerSidePropsType<typeof get
                                         <Modal opened={opened} onClose={close} centered title="Revoke Access">
                                             <Modal.Body style={{display: 'flex', flexDirection: 'column', gap: 10}}>
                                                 <h1>Are you sure that you would like to delete this user, thereby removing access?</h1>
-                                                <p>Please note that this would delete {user.participant_name}'s submissions and information. This is not recoverable.</p>
+                                                <p>Please note that this would delete {user.participant_name}&apos;s submissions and information. This is not recoverable.</p>
                                                 <Button color='red' onClick={async (event: any) => {
                                                     const res = await fetch('/api/tests/access', {
                                                         method: 'DELETE',

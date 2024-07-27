@@ -24,7 +24,7 @@ export function DeleteAccount({id, role}: any) {
                     role == 'owner' && id == 1 ? (
                         <Modal.Body>
                             <h1>You cannot delete your account.</h1>
-                            <p>Since you are the registered owner, you cannot delete your account. However, you can delete everything. If you click "delete everything," you will acknowledge that the database contents and everything will be deleted.</p>
+                            <p>Since you are the registered owner, you cannot delete your account. However, you can delete everything. If you click &quot;delete everything,&quot; you will acknowledge that the database contents and everything will be deleted.</p>
                             <form style={{
                                 display: 'flex',
                                 gap: 10,
