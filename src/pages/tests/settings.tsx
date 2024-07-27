@@ -16,6 +16,7 @@ import { Button,Loader,Modal, NativeSelect, NumberInput, PillsInput, Switch, Tab
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import DeleteTest from '@/components/DeleteTest';
+import Link from 'next/link';
 
 export const getServerSideProps = (async (args: any) => {  
     try {
@@ -228,7 +229,7 @@ export default function TestSettings(props: InferGetServerSidePropsType<typeof g
                             <p>{test_info.name} | Settings</p>
                         </div>
                         <div className={styles.testmore_header_actions}>
-                            <Button color='black' component="a" href={`/tests?test=${id}`}><span><ArrowLeft /> Back</span></Button>
+                            <Button color='black' component={Link} href={`/tests?test=${id}`}><span><ArrowLeft /> Back</span></Button>
                         </div>
                     </nav>
                     <div className={styles.testDescription}>

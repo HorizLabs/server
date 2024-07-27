@@ -35,7 +35,7 @@ DB_SSL = "SSL_REQUIRED_OR_NOT_AS_TRUE_OR_FALSE"
 JWT_SECRET = "JWT_SECRET_HERE"
 ```
 
-To give you an example, here is a sample file:
+To give you an example, here is sample content:
 
 ```bash
 DB_USER = "postgres"

@@ -10,6 +10,7 @@ import Navbar from "@/components/Navbar";
 import styles from '@/styles/Tests/Scoring.module.css'
 import { ArrowLeft, BarChart2, FilePlus, FileText, Key, Lock, Paperclip, Settings } from "react-feather";
 import { Button,Loader,Modal, Table, TextInput } from "@mantine/core";
+import Link from "next/link";
 
 export const getServerSideProps = (async (args: any) => {  
     try {
@@ -107,7 +108,7 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
                             <p>{test_info.name}</p>
                         </div>
                         <div className={styles.testmore_header_actions}>
-                            <Button color='black' component="a" href={`/tests?test=${id}`}><span><ArrowLeft /> Back</span></Button>
+                            <Button color='black' component={Link} href={`/tests?test=${id}`}><span><ArrowLeft /> Back</span></Button>
                         </div>
                     </nav>
                     <div className={styles.testDescription}>

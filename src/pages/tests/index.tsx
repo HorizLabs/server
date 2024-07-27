@@ -11,6 +11,7 @@ import styles from '@/styles/Tests.module.css'
 import { ArrowLeft, BarChart2, FilePlus, FileText, Key, Lock, Paperclip, Settings } from "react-feather";
 import { Button,Loader,Modal, NumberInput, TextInput } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
+import Link from "next/link";
 
 export const getServerSideProps = (async (args: any) => {  
     try {
@@ -169,10 +170,10 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
                             <p>{test_info.name}</p>
                         </div>
                         <div className={styles.testmore_header_actions}>
-                            <Button color='black' component="a" href={`/tests/question_bank?test=${id}`}><span><FileText /> Question Bank</span></Button>
-                            <Button color='black' component="a" href={`/tests/access?test=${id}`}><span><Key /> Access</span></Button>
-                            <Button color='black' component="a" href={`/tests/settings?test=${id}`}><span><Settings/> Settings</span></Button>
-                            <Button color='black' component="a" href={`/tests`}><span><ArrowLeft /> Back</span></Button>
+                            <Button color='black' component={Link} href={`/tests/question_bank?test=${id}`}><span><FileText /> Question Bank</span></Button>
+                            <Button color='black' component={Link} href={`/tests/access?test=${id}`}><span><Key /> Access</span></Button>
+                            <Button color='black' component={Link}href={`/tests/settings?test=${id}`}><span><Settings/> Settings</span></Button>
+                            <Button color='black' component={Link} href={`/tests`}><span><ArrowLeft /> Back</span></Button>
                         </div>
                     </nav>
                     <div className={styles.testDescription}>
@@ -251,14 +252,14 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
                         {(props?.test_info?.length != 0) ? (
                             props?.test_info?.map((test, id) => {
                                 return (
-                                    <a className={styles.test} key={id} href={`/tests?test=${test.id}`}>
+                                    <Link className={styles.test} key={id} href={`/tests?test=${test.id}`}>
                                         <h3>{test.name}</h3>
                                         <p>Tag: {test.test_status?.toLocaleUpperCase()}</p>
                                         {/* @ts-ignore */}
                                         <h4>Starts on {new Date(parseInt(test.starts_on)).toLocaleDateString()} at {new Date(parseInt(test.starts_on)).toLocaleTimeString()}</h4>
                                         {/* @ts-ignore */}
                                         <h4>Ends on {new Date(parseInt(test.ends_on)).toLocaleDateString()} at {new Date(parseInt(test.ends_on)).toLocaleTimeString()}</h4>
-                                    </a>
+                                    </Link>
                                 )
                             })
                         ): null}

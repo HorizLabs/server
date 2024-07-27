@@ -12,6 +12,7 @@ import { ArrowLeft, BarChart2, FilePlus, FileText, Key, Lock, Paperclip } from "
 import { Button,Input,Loader,Modal, NativeSelect, NumberInput, Table, TextInput } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
 import { Question } from "@/components/Question";
+import Link from "next/link";
 
 export const getServerSideProps = (async (args: any) => {  
     try {
@@ -163,7 +164,7 @@ export default function QBank(props: InferGetServerSidePropsType<typeof getServe
                             <p>{test_info.name} | Question Bank</p>
                         </div>
                         <div className={styles.testmore_header_actions}>
-                            <Button color='black' component="a" href={`/tests?test=${id}`}><span><ArrowLeft /> Back</span></Button>
+                            <Button color='black' component={Link} href={`/tests?test=${id}`}><span><ArrowLeft /> Back</span></Button>
                         </div>
                     </nav>
                     <div className={styles.testDescription}>

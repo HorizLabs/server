@@ -15,6 +15,7 @@ import { Activity, ArrowLeft, Eye, EyeOff } from "react-feather";
 import { Button, Loader, Modal, TextInput } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
 import { RenderDownload } from '@/components/RenderDownload';
+import Link from 'next/link';
 
 export const getServerSideProps = (async (args: any) => {  
     try {
@@ -135,7 +136,7 @@ export default function UserAccess(props: InferGetServerSidePropsType<typeof get
                 <Navbar />
                 <Modal opened={opened} onClose={close} centered title="Create Credentials">
                     <Modal.Body>
-                        <form onSubmit={createAccessCredentials} className={styles.createCredentials}>
+                        <form onSubmit={createAccessCredentials} style={{gap: 10, display: 'flex', flexDirection: 'column'}} >
                             <h1>Create user credentials</h1>
                             {sError == '' ? null : <p style={{color: 'red'}}>{sError}</p>}
                             <TextInput type='text' name='participant_name' placeholder='name' label="Participant Name" required/>
@@ -149,8 +150,8 @@ export default function UserAccess(props: InferGetServerSidePropsType<typeof get
                             <p>{test_info.name} | Access</p>
                         </div>
                         <div className={styles.testmore_header_actions}>
-                            <Button component="a" color='black' href={`/tests/scoring?test=${id}`}><span><Activity /> Grading & Analytics</span></Button>
-                            <Button component="a" color='black' href={`/tests?test=${id}`}><span><ArrowLeft /> Back</span></Button>
+                            <Button component={Link} color='black' href={`/tests/scoring?test=${id}`}><span><Activity /> Grading & Analytics</span></Button>
+                            <Button component={Link} color='black' href={`/tests?test=${id}`}><span><ArrowLeft /> Back</span></Button>
                         </div>
                     </nav>
                     <div className={styles.testDescription}>
@@ -191,15 +192,39 @@ export default function UserAccess(props: InferGetServerSidePropsType<typeof get
                                 <th>Participant Name</th>
                                 <th>Username</th>
                                 <th>Access Cards</th>
+                                <th>Manage</th>
                             </tr>
                             {query.length != 0 ? query.map((user, id) => {
+                                const [opened, {open, close}] = useDisclosure(false);
                                 return (
-                                    <tr key={id}>
-                                        <td>{user.id}</td>
-                                        <td>{user.participant_name}</td>
-                                        <td>{user.username}</td>
-                                        <RenderDownload user={user} />
-                                    </tr>
+                                    <>
+                                        <Modal opened={opened} onClose={close} centered title="Revoke Access">
+                                            <Modal.Body style={{display: 'flex', flexDirection: 'column', gap: 10}}>
+                                                <h1>Are you sure that you would like to delete this user, thereby removing access?</h1>
+                                                <p>Please note that this would delete {user.participant_name}'s submissions and information. This is not recoverable.</p>
+                                                <Button color='red' onClick={async (event: any) => {
+                                                    const res = await fetch('/api/tests/access', {
+                                                        method: 'DELETE',
+                                                        body: JSON.stringify({
+                                                            'participant_id': user.id
+                                                        })
+                                                    })
+
+                                                    const data = await res.json()
+                                                    if (data.coreStatus == 'REVOKED_ACCESS') {
+                                                        window.location.reload()
+                                                    }
+                                                }}>I confirm that I would like to revoke access.</Button>
+                                            </Modal.Body>
+                                        </Modal>
+                                        <tr key={id}>
+                                            <td>{user.id}</td>
+                                            <td>{user.participant_name}</td>
+                                            <td>{user.username}</td>
+                                            <RenderDownload user={user} />
+                                            <td><Button color='red' onClick={open}>Revoke</Button></td>
+                                        </tr>
+                                    </>
                                 )
                             }) : null}
                         </tbody>

@@ -1,5 +1,6 @@
 import { Button, Modal, Table } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { DeleteQuestionBankQuestion } from "./DeleteQuestionBankQuestion";
 
 export function Question(props: any) {
     const { question, id } = props;
@@ -15,6 +16,7 @@ export function Question(props: any) {
                         <p>Points: {question.points}</p>
                         {question.options != null && question.options != '' ? <p>Options: {question.options}</p> : null}
                         <p>Question Type: {question.multiple_choice ? 'Multiple Choice' : question.long_answer ? 'Long Answer' : question.short_answer ? 'Short Answer' : 'None'}</p>
+                        <DeleteQuestionBankQuestion id={question.id} />
                     </Modal.Body>
                 </Modal>
                     <Table.Td>{question.id}</Table.Td>
