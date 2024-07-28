@@ -1,23 +1,25 @@
 import { Button, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { useState } from "react";
+import { CreateRole } from "./CreateRole";
 
 export function RoleManager(props: any) {
     let rolePermissions = props.rolePermissions;
-    console.log(rolePermissions)
     const [opened, { open, close }] = useDisclosure(false);
-
     return (
         <>
             <Modal opened={opened} onClose={close} title="Role Manager" size="md" centered>
                 <Modal.Body>
-                    <p>System Roles that you cannot change:</p>
+                    <h1>Available Roles</h1>
                     <ul>
                         <li>Owner</li>
                         <li>Admin</li>
+                        <li>Staff</li>
+                        {rolePermissions.map((role: any, id: any) => {
+                            return <li>{role.role}</li>
+                        })}
                     </ul>
-                    <p>Roles</p>
-
+                    <CreateRole />
                 </Modal.Body>
             </Modal>
             <Button onClick={open}>Role Manager</Button>
