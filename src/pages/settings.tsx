@@ -4,7 +4,7 @@ import styles from '@/styles/Settings.module.css'
 // Other Imports
 import Head from "next/head";
 import { db } from "@/db/db";
-import { account } from "@/db/schema";
+import { account, role } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { useEffect } from "react";
 import * as jwt from "jose";
@@ -12,9 +12,10 @@ import * as crypto from "crypto";
 import { InferGetServerSidePropsType } from "next";
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, Hexagon } from 'react-feather';
+import { ArrowLeft, Box, Hexagon } from 'react-feather';
 import { SettingsSidebar } from '@/components/SettingsSidebar';
 import { AccountManagement } from '@/components/AccountManagement';
+import { RoleManager } from '@/components/settings/RoleManager';
 
 export const getServerSideProps = (async (args: any) => {  
     try {
@@ -48,13 +49,17 @@ export const getServerSideProps = (async (args: any) => {
                     props: {sessionStatus: false}
                 }
             }
-            
+            let rolePermissions = await db.select({
+                role: role.name,
+                manage_roles: role.manageRoles
+                // @ts-ignore
+            }).from(role).where(eq(role.name, account_info[0].role))
             return {
                 // Ternary operator for that determination
-                props: {sessionStatus: true, account: account_info[0]}
+                props: {sessionStatus: true, account: account_info[0], rolePermissions: rolePermissions}
             }
         }
-    } catch {
+    } catch (e) {
         // Catch and attempt to logout 
         return {
             props: {sessionStatus: false}
@@ -77,6 +82,7 @@ export default function Settings(props: InferGetServerSidePropsType<typeof getSe
         )    
     }
     let account_info = props.account
+    let rolePermissions = props.rolePermissions
     return(
         <>
             <Head>
@@ -104,8 +110,8 @@ export default function Settings(props: InferGetServerSidePropsType<typeof getSe
                 </div>
             </nav>
             <main className={styles.content}>
-               <SettingsSidebar />
-                <section id='name' className={styles.content_column}>
+                <h1 style={{display: 'flex', justifyContent: 'center'}}>Settings</h1>
+                <section id='identity' className={styles.content_column} style={{marginTop: '2em'}}>
                     <div className={styles.header}>
                         <h2 style={{display: 'flex', alignItems: 'center', gap: 5}}><Hexagon /> Identity</h2>
                     </div>
@@ -125,6 +131,23 @@ export default function Settings(props: InferGetServerSidePropsType<typeof getSe
                         <Image className={styles.pfp_image} src={`/api/profile_icon?name=${account_info?.name}`} width={150} height={150} alt='profile_always_changes' />
                     </div>
                 </section>
+                {/* @ts-ignore */}
+                {((rolePermissions.length != 0 && rolePermissions[0].manage_roles) || account_info?.role) == 'owner' ?
+                <section id="roles" className={styles.content_column} style={{
+                    gap: '0.5em'
+                }}>
+                    <div className={styles.header}>
+                        <h2 style={{display: 'flex', alignItems: 'center', gap: 5}}><Box /> Roles</h2>
+                    </div>
+                    <p>Roles are for assigning individuals specific permissions by creating a name.</p>
+                    <div style={{
+                        display: 'flex',
+                        gap: '1em'
+                    }}>
+                        <RoleManager rolePermissions={rolePermissions} />
+                    </div>
+                </section>
+                : null}
             </main>
         </>
     )

@@ -10,7 +10,11 @@
 }
 
 .content_column {
-  margin-left: 21%;
+  margin: auto;
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .pfp_image {

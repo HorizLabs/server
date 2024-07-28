@@ -60,3 +60,17 @@ export const questionSubmission = platform.table('platform_question_submission',
     response: text('question_response'),
     points_awarded: serial('points')
 })
+
+export const role = platform.table('platform_roles', {
+    id: serial('id').primaryKey(),
+    name: text('role_name'),
+    createUsers: boolean('create_users').default(false),
+    modifyUsers: boolean('modify_users').default(false),
+    createTests: boolean('create_tests').default(false),
+    createTestQuestions: boolean('create_questions').default(true),
+    createTestCredentials: boolean('create_test_credentials').default(true),
+    gradeTestResponses: boolean('grade_test_responses').default(true),
+    modifyTestSettings: boolean('modify_test_settings').default(false),
+    proctorTests: boolean('proctor_tests').default(false),
+    manageRoles: boolean('manage_roles').default(false)
+})

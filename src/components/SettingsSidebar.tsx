@@ -4,7 +4,7 @@ import Link from 'next/link'
 export function SettingsSidebar() {
     return (
         <div className={styles.sidebar}>
-            <Link href={'#roles'}>HE</Link>
+            <Link href={'#identity'}>Identity</Link>
         </div>
     )
 }

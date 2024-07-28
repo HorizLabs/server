@@ -9,7 +9,7 @@ import { InferGetServerSidePropsType } from "next";
 import Navbar from "@/components/Navbar";
 import styles from '@/styles/Tests.module.css'
 import { ArrowLeft, BarChart2, FilePlus, FileText, Key, Lock, Paperclip, Settings } from "react-feather";
-import { Button,Loader,Modal, NumberInput, TextInput } from "@mantine/core";
+import { Badge, Button,Card,Group,Loader,Modal, NumberInput, Text, TextInput } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
 import Link from "next/link";
 
@@ -252,14 +252,19 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
                         {(props?.test_info?.length != 0) ? (
                             props?.test_info?.map((test, id) => {
                                 return (
-                                    <Link className={styles.test} key={id} href={`/tests?test=${test.id}`}>
-                                        <h3>{test.name}</h3>
-                                        <p>Tag: {test.test_status?.toLocaleUpperCase()}</p>
-                                        {/* @ts-ignore */}
-                                        <h4>Starts on {new Date(parseInt(test.starts_on)).toLocaleDateString()} at {new Date(parseInt(test.starts_on)).toLocaleTimeString()}</h4>
-                                        {/* @ts-ignore */}
-                                        <h4>Ends on {new Date(parseInt(test.ends_on)).toLocaleDateString()} at {new Date(parseInt(test.ends_on)).toLocaleTimeString()}</h4>
-                                    </Link>
+                                    <Card component={Link} shadow="sm" padding="lg" radius="md" style={{width: 'fit-content'}} withBorder href={`/tests?test=${test.id}`}>
+                                        <Group justify="space-between" mt={'md'} mb={'xs'}>
+                                            <Text size="xl">{test.name}</Text>
+                                            <Badge color="grape">{test.test_status?.toLocaleUpperCase()}</Badge>
+                                        </Group>
+                                        <Text c={'dimmed'} size="md">{test.description}</Text>
+                                        <Group align="center" style={{flexDirection: 'column'}}>
+                                                {/* @ts-ignore */}
+                                                <Text size="sm" c={'dimmed'}>Starts on {new Date(parseInt(test.starts_on)).toLocaleDateString()} at {new Date(parseInt(test.starts_on)).toLocaleTimeString()}</Text>
+                                                {/* @ts-ignore */}
+                                                <Text size="sm" c={'dimmed'}>Ends on {new Date(parseInt(test.ends_on)).toLocaleDateString()} at {new Date(parseInt(test.ends_on)).toLocaleTimeString()}</Text>
+                                        </Group>
+                                    </Card>
                                 )
                             })
                         ): null}
