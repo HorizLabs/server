@@ -23,33 +23,42 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 return;
             }
             // @ts-ignore
-            let role_list = await db.select().from(role).where(eq(role.name, accountInfo[0].role))
+            let role_list = await db.select().from(role).where(eq(role.name, data.role_name))
+            // @ts-ignore
+            let role_check = await db.select().from(role).where(eq(role.name, accountInfo[0].role))
             if (role_list.length != 0) {
-                res.status(421).json({
+                res.status(422).json({
                     coreStatus: 'CANNOT_CREATE',
                     message: 'The role name conflicts with another role\'s name.'
                 })
+                return;
             }
-            
-            let role_management = {
-                manageRoles: data.manage_roles || false,
-                createTests: data.create_tests || false,
-                createTestQuestions: data.create_test_questions || true,
-                modifyTestSettings: data.manage_test_settings || false,
-                createTestCredentials: data.create_test_credentials || true,
-                proctorTests: data.proctor_tests || false,
-                gradeTestResponses: data.grade_responses || true,
-            }
-            let name_capitalized = data.role_name.replace(/\s/g, '_').toLowerCase().charAt(0).toUpperCase() + data.role_name.replace(/\s/g, '_').slice(1)
-            await db.insert(role).values({
-                name: name_capitalized,
-                ...role_management
-            })
-                        
-            res.status(201).json({
-                coreStatus: 'CREATED_ROLE',
-                message: 'Role has been created.'
-            })
+            if (role_check.length != 0 && role_check[0].manageRoles == true || role_check[0].name == 'owner') {
+                let role_management = {
+                    manageRoles: data.manage_roles || false,
+                    createTests: data.create_tests || false,
+                    createTestQuestions: data.create_test_questions || true,
+                    modifyTestSettings: data.manage_test_settings || false,
+                    createTestCredentials: data.create_test_credentials || true,
+                    proctorTests: data.proctor_tests || false,
+                    gradeTestResponses: data.grade_responses || true,
+                }
+                let name_capitalized = data.role_name.replace(/\s/g, '_').toLowerCase().charAt(0).toUpperCase() + data.role_name.replace(/\s/g, '_').slice(1)
+                await db.insert(role).values({
+                    name: name_capitalized,
+                    ...role_management
+                })
+                            
+                res.status(201).json({
+                    coreStatus: 'CREATED_ROLE',
+                    message: 'Role has been created.'
+                })                
+            } else {
+                res.status(403).json({
+                    coreStatus: 'NOT_ALLOWED',
+                    message: 'You are not allowed to create a role.'
+                })
+            }       
         } catch (e) {
             res.status(400).json({
                 coreStatus: 'ERROR',

@@ -76,12 +76,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     return;
                 }
                 let check = await db.select().from(account).where(eq(account.email, data.email))
-                if (check.length >= 1) {
+                if (check.length >= 1 && check[0].id != data.id) {
                     res.status(422).json({
                         coreStatus: 'CANNOT_MODIFY_INFORMATION',
                         message: 'Email already exists, cannot update.'
                     })
                 } else {
+                    let database_role_query = data?.role.charAt(0).toUpperCase() + data?.role.slice(1)
+                    let role_query = await db.select().from(role).where(eq(role.name, database_role_query))
+                    console.log(role_query)
+                    if (role_query.length >= 1 && database_role_query != 'Owner' && database_role_query != 'Admin' && database_role_query != 'Staff') {
+                        await db.update(account).set({'name': data.name, 'email': data.email, 'role': database_role_query}).where(eq(account.id, data.id))
+                        res.status(201).json({
+                            coreStatus: 'UPDATED_ACCOUNT',
+                            message: 'Updated Account Successfully'
+                        })    
+                        return;
+                    }    
                     // Update account
                     await db.update(account).set({'name': data.name, 'email': data.email, 'role': updatedRole}).where(eq(account.id, data.id))
                     res.status(201).json({

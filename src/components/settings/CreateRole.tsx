@@ -34,9 +34,10 @@ export function CreateRole() {
                         <TextInput label="Role Name" name="role_name" placeholder="Role Name" required />
                         <p>Permissions</p>
                         <div style={{display: 'flex', gap: 15}}>
-                            <Switch label="Create Tests" name="create_tests" />
+                            <Switch label="Manage Roles" name="manage_roles" />
                         </div>
                         <div style={{display: 'flex', gap: 15}}>
+                            <Switch label="Create Tests" name="create_tests" />
                             <Switch label="Create Test Questions" name="create_test_questions" />
                             <Switch label="Manage Test Settings" name="manage_test_settings" />
                         </div>
