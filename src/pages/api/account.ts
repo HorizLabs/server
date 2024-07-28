@@ -58,7 +58,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             let info = await await (await jwt.jwtVerify(cookie, crypto.createSecretKey(process.env.JWT_SECRET, 'utf-8')));
             // @ts-ignore
             let accountInfo = await db.select().from(account).where(eq(account.email, info.payload.email))
-            if (accountInfo[0].id == 1 && accountInfo[0].role == 'owner') {
+            if (accountInfo[0].role == 'owner') {
                 let password = data.password
                 let salt = accountInfo[0].salt
                 // @ts-ignore
@@ -87,6 +87,73 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     res.status(201).json({
                         coreStatus: 'CONFIRMED_DELETED',
                         message: 'Account has been deleted. Have a good day!'
+                    })
+                }
+            }
+        } catch (e) {
+            res.status(400).json({
+                coreStatus: 'ERROR',
+                message: 'Could not delete account',
+            })
+        }
+    } else if (req.method == 'PUT') {
+        try {
+            // Get data
+            const data = JSON.parse(req.body)
+            let cookie = await req.cookies['token']
+            // @ts-ignore
+            let info = await await (await jwt.jwtVerify(cookie, crypto.createSecretKey(process.env.JWT_SECRET, 'utf-8')));
+            // @ts-ignore
+            let accountInfo = await db.select().from(account).where(eq(account.email, info.payload.email))
+
+            if (accountInfo.length == 0) { 
+                res.status(403).json({
+                    coreStatus: 'CANNOT_CHANGE',
+                    message: 'You are not authenticated.'
+                })
+                return;
+            } else {
+                if (data.feature == 'CHANGE_EMAIL'
+                    && data.new_email == data.confirm_new_email
+                    && accountInfo[0].email == data.old_email) {
+                        let check = await db.select().from(account).where(eq(account.email, data.new_email))
+                        if (check.length >= 1) {
+                            res.status(402).json({
+                                coreStatus: 'CONFLICTING_EMAIL',
+                                message: 'Current email conflicts with annother account.'
+                            })
+                            return;        
+                        }
+                        await db.update(account).set({
+                            'email': data.new_email
+                        }).where(eq(account.id, accountInfo[0].id))
+                    res.status(200).json({
+                        coreStatus: 'CHANGED_EMAIL',
+                        message: 'Successfully changed your account.'
+                    })
+                    return;
+                } else if (data.feature == 'CHANGE_EMAIL'
+                    && data.new_email != data.confirm_new_email) {
+                    res.status(200).json({
+                        coreStatus: 'FAILED_TO_CHANGE_EMAIL',
+                        message: 'Failed to change email due to new email not being confirmed.'
+                    })
+                    return;
+                } else if (data.feature == 'CHANGE_PASSWORD'
+                    && data.new_password == data.confirm_new_password
+                    // @ts-ignore
+                    && accountInfo[0].password == crypto.pbkdf2Sync(data.old_password, accountInfo[0].salt, 19847, 80, 'sha512').toString('hex'))
+                {
+                    let new_salt = crypto.randomBytes(32).toString('hex')
+                    // Create hash
+                    let new_password = crypto.pbkdf2Sync(data.new_password, new_salt, 19847, 80, 'sha512').toString('hex')
+                    await db.update(account).set({
+                        'password': new_password,
+                        'salt': new_salt
+                    }).where(eq(account.id, accountInfo[0].id))
+                    res.status(200).json({
+                        coreStatus: 'CHANGED_PASSWORD',
+                        message: 'Changed password successfully.'
                     })
                 }
             }

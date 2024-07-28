@@ -220,7 +220,7 @@ export default function UsersPage(props: InferGetServerSidePropsType<typeof getS
                                 <TextInput type="text" id="name" name="name" placeholder="Name" defaultValue={props.account_id_info[0].name} label="Name" required />
                                 {/* @ts-ignore */}
                                 <TextInput type="text" id="email" name="email" placeholder="Email" label="Email" defaultValue={props.account_id_info[0].email} required />
-                                <NativeSelect id="role" label="Role" data={(account_info?.role == 'owner') ? ['Owner', 'Admin', 'Staff'] : ['Staff']} defaultValue={user_role} name="role" required/>
+                                <NativeSelect id="role" label="Role" data={(account_info?.role == 'owner') ? ['Admin', 'Staff'] : ['Staff']} defaultValue={user_role} name="role" required/>
                                 <div className={styles.accountModificationRow}>
                                     <Button type="submit">Modify Account</Button>
                                     <Button onClick={open} color="red">Delete Account</Button>
@@ -260,7 +260,7 @@ export default function UsersPage(props: InferGetServerSidePropsType<typeof getS
                     <TextInput type="text" name="name" placeholder="Name" label="Name" required />
                     <TextInput type="text" name="email" placeholder="Email" label="Email" required />
                     <PasswordInput type="text" name="password" placeholder="Password" label="Password" required />
-                    <NativeSelect label="Role" data={(account_info?.role == 'owner') ? ['Owner', 'Admin', 'Staff'] : ['Staff']} name="role" required/>
+                    <NativeSelect label="Role" data={(account_info?.role == 'owner') ? ['Admin', 'Staff'] : ['Staff']} name="role" required/>
                     {loadingButton ? <Button><Loader color="white" style={{transform: 'scale(0.7)'}} /></Button>: <Button type="submit">Create Account</Button>}
                 </form>
             </Modal>
