@@ -75,12 +75,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     })
                     return;
                 }
-                // Update account
-                await db.update(account).set({'name': data.name, 'email': data.email, 'role': updatedRole}).where(eq(account.id, data.id))
-                res.status(201).json({
-                    coreStatus: 'UPDATED_ACCOUNT',
-                    message: 'Updated Account Successfully'
-                })
+                let check = await db.select().from(account).where(eq(account.email, data.email))
+                if (check.length >= 1) {
+                    res.status(422).json({
+                        coreStatus: 'CANNOT_MODIFY_INFORMATION',
+                        message: 'Email already exists, cannot update.'
+                    })
+                } else {
+                    // Update account
+                    await db.update(account).set({'name': data.name, 'email': data.email, 'role': updatedRole}).where(eq(account.id, data.id))
+                    res.status(201).json({
+                        coreStatus: 'UPDATED_ACCOUNT',
+                        message: 'Updated Account Successfully'
+                    })
+                }
             } else {
                 res.status(403).json({
                     coreStatus: 'NOT_ALLOWED_ROLE',
@@ -117,6 +125,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     res.status(403).json({
                         coreStatus: 'NOT_ALLOWED_CREATE_USER_HIGHER_ROLE',
                         message: 'You are not allowed to create a user with a higher role than you.'
+                    })
+                    return;
+                }
+                let check = await db.select().from(account).where(eq(account.email, data.email))
+                if (check.length >= 1) {
+                    res.status(422).json({
+                        coreStatus: 'CANNOT_MODIFY_INFORMATION',
+                        message: 'Email already exists, cannot create account.'
                     })
                     return;
                 }
