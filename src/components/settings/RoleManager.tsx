@@ -1,6 +1,5 @@
 import { Button, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { useState } from "react";
 import { CreateRole } from "./CreateRole";
 
 export function RoleManager(props: any) {
@@ -16,7 +15,7 @@ export function RoleManager(props: any) {
                         <li>Admin</li>
                         <li>Staff</li>
                         {rolePermissions.map((role: any, id: any) => {
-                            return <li>{role.role}</li>
+                            return <li key={id}>{role.name}</li>
                         })}
                     </ul>
                     <CreateRole />

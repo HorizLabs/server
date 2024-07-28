@@ -64,8 +64,6 @@ export const questionSubmission = platform.table('platform_question_submission',
 export const role = platform.table('platform_roles', {
     id: serial('id').primaryKey(),
     name: text('role_name'),
-    createUsers: boolean('create_users').default(false),
-    modifyUsers: boolean('modify_users').default(false),
     createTests: boolean('create_tests').default(false),
     createTestQuestions: boolean('create_questions').default(true),
     createTestCredentials: boolean('create_test_credentials').default(true),

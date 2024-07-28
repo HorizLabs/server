@@ -54,9 +54,11 @@ export const getServerSideProps = (async (args: any) => {
                 manage_roles: role.manageRoles
                 // @ts-ignore
             }).from(role).where(eq(role.name, account_info[0].role))
+            let roles = await db.select().from(role)
+            console.log(roles)
             return {
                 // Ternary operator for that determination
-                props: {sessionStatus: true, account: account_info[0], rolePermissions: rolePermissions}
+                props: {sessionStatus: true, account: account_info[0], rolePermissions: rolePermissions, roles: roles}
             }
         }
     } catch (e) {
@@ -144,7 +146,7 @@ export default function Settings(props: InferGetServerSidePropsType<typeof getSe
                         display: 'flex',
                         gap: '1em'
                     }}>
-                        <RoleManager rolePermissions={rolePermissions} />
+                        <RoleManager rolePermissions={props.roles} />
                     </div>
                 </section>
                 : null}

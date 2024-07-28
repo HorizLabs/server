@@ -1,5 +1,5 @@
 import { db } from '@/db/db'
-import { account } from '@/db/schema'
+import { account, role } from '@/db/schema'
 import * as jwt from 'jose'
 import * as crypto from 'crypto'
 import { eq } from 'drizzle-orm'
@@ -108,12 +108,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 let roleAIndex = roles.indexOf(roleA)
                 let roleBIndex = roles.indexOf(roleB)
                 return roleAIndex > roleBIndex
-            }    
+            }   
             // Get data
             const data = JSON.parse(req.body)
             let cookie = await req.cookies['token']
             // @ts-ignore
             let info = await await (await jwt.jwtVerify(cookie, crypto.createSecretKey(process.env.JWT_SECRET, 'utf-8')));
+            
             // @ts-ignore
             let accountInfo = await db.select().from(account).where(eq(account.email, info.payload.email))
             if (accountInfo[0].role == 'owner' || accountInfo[0].role == 'admin') {
@@ -128,6 +129,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     })
                     return;
                 }
+
                 let check = await db.select().from(account).where(eq(account.email, data.email))
                 if (check.length >= 1) {
                     res.status(422).json({
@@ -139,6 +141,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 // Create hash
                 let password = crypto.pbkdf2Sync(data.password, salt, 19847, 80, 'sha512').toString('hex')
                 // Create account
+                let database_role_query = data?.role.charAt(0).toUpperCase() + data?.role.slice(1)
+                let role_query = await db.select().from(role).where(eq(role.name, database_role_query))
+                if (role_query.length >= 1 && database_role_query != 'Owner' && database_role_query != 'Admin' && database_role_query != 'Staff') {
+                    await db.insert(account).values({'name': data.name, 'email': data.email, 'password': password, 'role': database_role_query, 'salt': salt})
+                    res.status(201).json({
+                        coreStatus: 'CREATED_ACCOUNT',
+                        message: 'Created Account Successfully'
+                    })    
+                    return;
+                }
                 await db.insert(account).values({'name': data.name, 'email': data.email, 'password': password, 'role': updatedRole, 'salt': salt})
                 res.status(201).json({
                     coreStatus: 'CREATED_ACCOUNT',

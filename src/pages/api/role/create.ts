@@ -1,5 +1,5 @@
 import { db } from '@/db/db'
-import { account, role, role } from '@/db/schema'
+import { account, role } from '@/db/schema'
 import * as jwt from 'jose'
 import * as crypto from 'crypto'
 import { eq } from 'drizzle-orm'
@@ -27,11 +27,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             if (role_list.length != 0) {
                 res.status(421).json({
                     coreStatus: 'CANNOT_CREATE',
-                    message: 'The role name conflicts with another role.'
+                    message: 'The role name conflicts with another role\'s name.'
                 })
             }
             
-
+            let role_management = {
+                manageRoles: data.manage_roles || false,
+                createTests: data.create_tests || false,
+                createTestQuestions: data.create_test_questions || true,
+                modifyTestSettings: data.manage_test_settings || false,
+                createTestCredentials: data.create_test_credentials || true,
+                proctorTests: data.proctor_tests || false,
+                gradeTestResponses: data.grade_responses || true,
+            }
+            let name_capitalized = data.role_name.replace(/\s/g, '_').toLowerCase().charAt(0).toUpperCase() + data.role_name.replace(/\s/g, '_').slice(1)
+            await db.insert(role).values({
+                name: name_capitalized,
+                ...role_management
+            })
+                        
             res.status(201).json({
                 coreStatus: 'CREATED_ROLE',
                 message: 'Role has been created.'

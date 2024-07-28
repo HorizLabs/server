@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { db } from "@/db/db";
-import { account, tests } from "@/db/schema";
+import { account, role, tests } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { useEffect, useState } from "react";
 import * as jwt from "jose";
@@ -12,8 +12,7 @@ import { FilePlus, Paperclip, UserPlus, Users, X } from "react-feather";
 import { Button,Loader,Modal, NativeSelect, PasswordInput, PinInput, TextInput } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
 
-export const getServerSideProps = (async (args: any) => {  
-
+export const getServerSideProps = (async (args: any) => {
     try {
         // Check to ensure that there is a cookie when the page is loaded.
         if (typeof args.req.cookies['token'] == 'undefined') {
@@ -39,6 +38,7 @@ export const getServerSideProps = (async (args: any) => {
                 role: account.role
             // @ts-ignore
             }).from(account).where(eq(account.email, email))
+            let role_list = await db.select().from(role)
             if (account_info.length == 0) {
                 return {
                     // Ternary operator for that determination
@@ -57,12 +57,12 @@ export const getServerSideProps = (async (args: any) => {
                     id: account.id
                 }).from(account).where(eq(account.id, acc_id))
                 return {
-                    props: {sessionStatus: true, accountLoginStatus: false, account: account_info[0], account_id_info: account_id_info}
+                    props: {sessionStatus: true, accountLoginStatus: false, account: account_info[0], account_id_info: account_id_info,role_list:role_list}
                 }
             }
             return {
                 // Ternary operator for that determination
-                props: {sessionStatus: true, account: account_info[0], accounts_info: accountInfo}
+                props: {sessionStatus: true, account: account_info[0], accounts_info: accountInfo, role_list: role_list}
             }
         }
     } catch (e) {
@@ -81,6 +81,12 @@ export default function UsersPage(props: InferGetServerSidePropsType<typeof getS
     const [errorInfo, setErrorInfo] = useState<String>('')
     const [opened, {open, close}] = useDisclosure(false);
 
+    let owner_role_list = ['Admin', 'Staff']
+    let role_list = ['Staff']
+    props.role_list?.map((role: any) => {
+        owner_role_list.push(role.name)
+        role_list.push(role.name)
+    })
     // Create
     const createAccount = async (event: any) => {
         event.preventDefault();
@@ -220,7 +226,10 @@ export default function UsersPage(props: InferGetServerSidePropsType<typeof getS
                                 <TextInput type="text" id="name" name="name" placeholder="Name" defaultValue={props.account_id_info[0].name} label="Name" required />
                                 {/* @ts-ignore */}
                                 <TextInput type="text" id="email" name="email" placeholder="Email" label="Email" defaultValue={props.account_id_info[0].email} required />
-                                <NativeSelect id="role" label="Role" data={(account_info?.role == 'owner') ? ['Admin', 'Staff'] : ['Staff']} defaultValue={user_role} name="role" required/>
+                                <NativeSelect id="role" label="Role" data={
+                                    (
+                                    account_info?.role == 'owner') ? owner_role_list : role_list
+                                } defaultValue={user_role} name="role" required/>
                                 <div className={styles.accountModificationRow}>
                                     <Button type="submit">Modify Account</Button>
                                     <Button onClick={open} color="red">Delete Account</Button>
@@ -260,7 +269,7 @@ export default function UsersPage(props: InferGetServerSidePropsType<typeof getS
                     <TextInput type="text" name="name" placeholder="Name" label="Name" required />
                     <TextInput type="text" name="email" placeholder="Email" label="Email" required />
                     <PasswordInput type="text" name="password" placeholder="Password" label="Password" required />
-                    <NativeSelect label="Role" data={(account_info?.role == 'owner') ? ['Admin', 'Staff'] : ['Staff']} name="role" required/>
+                    <NativeSelect label="Role" data={(account_info?.role == 'owner') ? owner_role_list : role_list} name="role" required/>
                     {loadingButton ? <Button><Loader color="white" style={{transform: 'scale(0.7)'}} /></Button>: <Button type="submit">Create Account</Button>}
                 </form>
             </Modal>
