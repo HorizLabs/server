@@ -6,18 +6,21 @@ import Head from "next/head";
 import { db } from "@/db/db";
 import { account, role } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import * as jwt from "jose";
 import * as crypto from "crypto";
 import { InferGetServerSidePropsType } from "next";
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, Box, Hexagon } from 'react-feather';
+import { ArrowLeft, Box, Hexagon, Octagon } from 'react-feather';
 import { SettingsSidebar } from '@/components/SettingsSidebar';
 import { AccountManagement } from '@/components/AccountManagement';
 import { RoleManager } from '@/components/settings/RoleManager';
+import { Switch } from '@mantine/core';
+import { experimental } from '@/lib/experimental';
 
 export const getServerSideProps = (async (args: any) => {  
+    console.log(process.env.EXPERIMENTAL || false)
     try {
         // Check to ensure that there is a cookie when the page is loaded.
         if (typeof args.req.cookies['token'] == 'undefined') {
@@ -55,9 +58,10 @@ export const getServerSideProps = (async (args: any) => {
                 // @ts-ignore
             }).from(role).where(eq(role.name, account_info[0].role))
             let roles = await db.select().from(role)
+            let experimentalCheck = experimental || false
             return {
                 // Ternary operator for that determination
-                props: {sessionStatus: true, account: account_info[0], rolePermissions: rolePermissions, roles: roles}
+                props: {sessionStatus: true, account: account_info[0], rolePermissions: rolePermissions, roles: roles, experimental: experimentalCheck}
             }
         }
     } catch (e) {
@@ -69,6 +73,7 @@ export const getServerSideProps = (async (args: any) => {
 })
 
 export default function Settings(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+    let [experimental, setExperimental] = useState(props.experimental || false)
     // Set account info
     useEffect(() => {
         if (!props.sessionStatus)  {
@@ -84,6 +89,21 @@ export default function Settings(props: InferGetServerSidePropsType<typeof getSe
     }
     let account_info = props.account
     let rolePermissions = props.rolePermissions
+
+    const enableExperimental = async (event: any) => {
+        let checked = event.currentTarget.checked
+        let res = await fetch('/api/experiments', {
+            method: 'POST',
+            body: JSON.stringify({
+                enable: checked
+            })
+        })
+        if ((await res.json()).coreStatus == 'FINALIZED_STATUS') {
+            setExperimental(true)
+        } else {
+            setExperimental(false)
+        }
+    }
     return(
         <>
             <Head>
@@ -134,21 +154,37 @@ export default function Settings(props: InferGetServerSidePropsType<typeof getSe
                 </section>
                 {/* @ts-ignore */}
                 {((rolePermissions.length != 0 && rolePermissions[0].manage_roles) || account_info?.role  == 'owner') ?
-                <section id="roles" className={styles.content_column} style={{
-                    gap: '0.5em'
-                }}>
-                    <div className={styles.header}>
-                        <h2 style={{display: 'flex', alignItems: 'center', gap: 5}}><Box /> Roles</h2>
-                    </div>
-                    <p>Roles are for assigning individuals specific permissions by creating a name.</p>
-                    <div style={{
-                        display: 'flex',
-                        gap: '1em'
+                <>
+                    <section id="roles" className={styles.content_column} style={{
+                        gap: '0.5em'
                     }}>
-                        <RoleManager rolePermissions={props.roles} />
-                    </div>
-                </section>
+                        <div className={styles.header}>
+                            <h2 style={{display: 'flex', alignItems: 'center', gap: 5}}><Box /> Roles</h2>
+                        </div>
+                        <p>Roles are for assigning individuals specific permissions by creating a name.</p>
+                        <div style={{
+                            display: 'flex',
+                            gap: '1em'
+                        }}>
+                            <RoleManager rolePermissions={props.roles} />
+                        </div>
+                    </section>
+                </>
                 : null}
+                {(account_info?.role == 'owner' || account_info?.role == 'admin') ? (
+                    <>
+                        <br />
+                        <section id='beta' className={styles.content_column} style={{
+                        gap: '0.5em'
+                        }}>
+                            <div className={styles.header}>
+                                <h2 style={{display: 'flex', alignItems: 'center', gap: 5}}><Octagon /> Preview</h2>
+                            </div>                          
+                            <p>Preview new features with the experimental flag.</p>
+                            <Switch label="Enable Experimental Features" onChange={enableExperimental} defaultChecked={experimental} />
+                        </section>
+                    </>
+                ) : null}
             </main>
         </>
     )

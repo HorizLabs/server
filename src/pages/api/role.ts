@@ -36,8 +36,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             if (role_check.length != 0 && role_check[0].manageRoles == true || accountInfo[0].role == 'owner') {
                 let role_management = {
                     'manageRoles': data.manage_roles != null ? data.manage_roles : false,
-                    'createTests': data.manage_roles != null ? data.create_tests : false,
-                    'createTestQuestions': data.manage_roles != null ? data.create_test_questions : false,
+                    'createTests': data.create_tests != null ? data.create_tests : false,
+                    'createTestQuestions': data.create_test_questions != null ? data.create_test_questions : false,
                     'modifyTestSettings': data.manage_test_settings || false,
                     'createTestCredentials': data.create_test_credentials || false,
                     'proctorTests': data.proctor_tests || false,
@@ -77,7 +77,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             if (accountInfo.length == 0) {
                 res.status(400).json({
                     coreStatus: 'DENIED',
-                    message: 'Creation has been denied.'
+                    message: 'Updation has been denied.'
                 })    
                 return;
             }
@@ -88,8 +88,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             if (role_check.length != 0 && role_check[0].manageRoles == true || accountInfo[0].role == 'owner') {
                 let role_management = {
                     'manageRoles': data.manage_roles != null ? data.manage_roles : false,
-                    'createTests': data.manage_roles != null ? data.create_tests : false,
-                    'createTestQuestions': data.manage_roles != null ? data.create_test_questions : false,
+                    'createTests': data.create_tests != null ? data.create_tests : false,
+                    'createTestQuestions': data.create_test_questions != null ? data.create_test_questions : false,
                     'modifyTestSettings': data.manage_test_settings || false,
                     'createTestCredentials': data.create_test_credentials || false,
                     'proctorTests': data.proctor_tests || false,
@@ -131,7 +131,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             if (accountInfo.length == 0) {
                 res.status(400).json({
                     coreStatus: 'DENIED',
-                    message: 'Creation has been denied.'
+                    message: 'Deletion has been denied.'
                 })    
                 return;
             }
