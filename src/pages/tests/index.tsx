@@ -252,7 +252,7 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
                         {(props?.test_info?.length != 0) ? (
                             props?.test_info?.map((test, id) => {
                                 return (
-                                    <Card component={Link} shadow="sm" padding="lg" radius="md" style={{width: 'fit-content'}} withBorder href={`/tests?test=${test.id}`}>
+                                    <Card component={Link} shadow="sm" padding="lg" radius="md" style={{width: 'fit-content'}} key={id} withBorder href={`/tests?test=${test.id}`}>
                                         <Group justify="space-between" mt={'md'} mb={'xs'}>
                                             <Text size="xl">{test.name}</Text>
                                             <Badge color="grape">{test.test_status?.toLocaleUpperCase()}</Badge>

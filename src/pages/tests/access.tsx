@@ -4,7 +4,7 @@ import styles from '@/styles/tests/Access.module.css'
 // Imports
 import Head from "next/head";
 import { db } from "@/db/db";
-import { account, question_bank, test_access, tests } from "@/db/schema";
+import { account, question_bank, role, test_access, tests } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { useEffect, useState } from "react";
 import * as jwt from "jose";
@@ -55,8 +55,10 @@ export const getServerSideProps = (async (args: any) => {
             if (args.query.test != undefined) {
                 let testInfo = await db.select().from(tests).where(eq(tests.id, parseInt(args.query.test)))
                 let accessInfo = await db.select().from(test_access).where(eq(test_access.test_id, parseInt(args.query.test)))
+                // @ts-ignore
+                let roler = await db.select().from(role).where(eq(role.name, account_info[0].role))
                 return {
-                    props: {sessionStatus: true, account: account_info[0], test_info: testInfo, test_id: parseInt(args.query.test), access_info: accessInfo}
+                    props: {sessionStatus: true, account: account_info[0], test_info: testInfo, test_id: parseInt(args.query.test), access_info: accessInfo, role: roler}
                 }
             }
             return {
@@ -121,6 +123,10 @@ export default function UserAccess(props: InferGetServerSidePropsType<typeof get
                 setError(data.message)
             }
         }
+        if ((props.role.length != 0 && (props.role[0].createTestCredentials == false || props.role[0].gradeTestResponses == false)) || account_info?.role == 'staff') {
+            window.location.replace('/tests')
+        }
+
         return (
             <>
                 <Head>
@@ -162,7 +168,8 @@ export default function UserAccess(props: InferGetServerSidePropsType<typeof get
                             {/* @ts-ignore */}
                             <p>Ends on {new Date(parseInt(test_info.ends_on)).toLocaleDateString()} at {new Date(parseInt(test_info.ends_on)).toLocaleTimeString()}</p>
                         </div>
-                        <Button onClick={open} style={{width: 'fit-content'}}>Create Credentials</Button>
+                        {/* @ts-ignore */}
+                        {(((props.role.length != 0 && (props.role[0].createTestCredentials == true))) || account_info.role != 'staff') ? <Button onClick={open}>Create Access Credentials</Button> : null}
                         <h1>Access</h1>
                     </div>
                     <TextInput label="Search" id='search_access' className={styles.searchAccess} placeholder='Participant ID, Participant Name, or by Username' onChange={(event: any) => {

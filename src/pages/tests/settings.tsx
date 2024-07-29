@@ -4,7 +4,7 @@ import styles from '@/styles/tests/Settings.module.css'
 // Other imports
 import Head from "next/head";
 import { db } from "@/db/db";
-import { account, tests, testSettings } from "@/db/schema";
+import { account, role, tests, testSettings } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { FormEvent, useEffect, useState } from "react";
 import * as jwt from "jose";
@@ -37,14 +37,14 @@ export const getServerSideProps = (async (args: any) => {
             // @ts-ignore
             let token_info = await (await jwt.jwtVerify(cookie, crypto.createSecretKey(process.env.JWT_SECRET, 'utf-8')));
             let email = token_info.payload?.email;
-            let account_info = await db.select({
+            let account_infoi = await db.select({
                 id: account.id,
                 name: account.name,
                 email: account.email,
                 role: account.role
             // @ts-ignore
             }).from(account).where(eq(account.email, email))
-            if (account_info.length == 0) {
+            if (account_infoi.length == 0) {
                 return {
                     // Ternary operator for that determination
                     props: {sessionStatus: false}
@@ -61,12 +61,15 @@ export const getServerSideProps = (async (args: any) => {
                     visibility: testSettings.test_status,
                     randomize_questions: testSettings.randomize_questions
                 }).from(testSettings).where(eq(testSettings.test_id, parseInt(args.query.test)))
+                // Role permission as its protected route
+                // @ts-ignore
+                let rolePermissions = await db.select().from(role).where(eq(role.name, account_infoi[0].role))
                 return {
-                    props: {sessionStatus: true, account: account_info[0], test_info: testInfo, test_id: parseInt(args.query.test), test_settings: settingsInfo}
+                    props: {sessionStatus: true, account: account_infoi[0], test_info: testInfo, test_id: parseInt(args.query.test), test_settings: settingsInfo, rolePermissions: rolePermissions}
                 }
             }
             return {
-                props: {sessionStatus: true, account: account_info[0], test_info: testInfo}
+                props: {sessionStatus: true, account: account_infoi[0], test_info: testInfo}
             }
         }
     } catch (e) {
@@ -100,7 +103,11 @@ export default function TestSettings(props: InferGetServerSidePropsType<typeof g
     let account_info = props.account
     // Diverge based on test ID
     // @ts-ignore
-    if (props.test_id != undefined && props.test_info[0] != undefined && account_info.role == 'owner' || account_info.role == 'admin') {
+    if ((account_info.role == 'staff') || (props.rolePermissions.length != 0 && props.rolePermissions[0].modifyTestSettings == false)) {
+        window.location.replace('/tests')
+    }
+    // @ts-ignore
+    if (props.test_id != undefined && props.test_info[0] != undefined) {
         // Parameters
         let id = props.test_id
         // @ts-ignore

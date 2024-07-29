@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { db } from "@/db/db";
-import { account, question_bank, tests } from "@/db/schema";
+import { account, question_bank, role, tests } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { useEffect, useState } from "react";
 import * as jwt from "jose";
@@ -52,8 +52,10 @@ export const getServerSideProps = (async (args: any) => {
             if (args.query.test != undefined) {
                 let testInfo = await db.select().from(tests).where(eq(tests.id, parseInt(args.query.test)))
                 let questionBank = await db.select().from(question_bank).where(eq(question_bank.test_id, parseInt(args.query.test)))
+                // @ts-ignore
+                let roler = await db.select().from(role).where(eq(role.name, account_info[0].role))               
                 return {
-                    props: {sessionStatus: true, account: account_info[0], test_info: testInfo, test_id: parseInt(args.query.test), questionBank: questionBank}
+                    props: {sessionStatus: true, account: account_info[0], test_info: testInfo, test_id: parseInt(args.query.test), questionBank: questionBank, role: roler}
                 }
             }
             return {
@@ -86,8 +88,9 @@ export default function QBank(props: InferGetServerSidePropsType<typeof getServe
     }
 
     let account_info = props.account
+    console.log(account_info)
     // Diverge based on test ID
-    if (props.test_id != undefined && props.test_info[0] != undefined) {
+    if (props.test_id != undefined && props.test_info[0] != undefined && (account_info?.role == 'owner' || account_info?.role == 'admin' || (props.role.length != 0 && props.role[0].createTestQuestions == true))) {
         let [loading, setLoading] = useState(false)
         let id = props.test_id
         let test_info = props.test_info[0]

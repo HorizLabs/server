@@ -15,7 +15,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             let info = await await (await jwt.jwtVerify(cookie, crypto.createSecretKey(process.env.JWT_SECRET, 'utf-8')));
             // @ts-ignore
             let accountInfo = await db.select().from(account).where(eq(account.email, info.payload.email))
-            if (accountInfo.length == 0) {
+            // @ts-ignore
+            let roleCheck = await db.select().from(role).where(eq(role.name, accountInfo[0].role))
+            if (accountInfo.length == 0 || (roleCheck.length != 0 && roleCheck[0].createTestCredentials == false) || accountInfo[0].role == 'staff') {
                 res.status(400).json({
                     coreStatus: 'CANNOT_ALLOW',
                     message: 'Your account does not exist.'
