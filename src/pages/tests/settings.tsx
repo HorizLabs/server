@@ -18,6 +18,7 @@ import { notifications } from '@mantine/notifications';
 import DeleteTest from '@/components/DeleteTest';
 import Link from 'next/link';
 import { experimental } from '@/lib/experimental';
+import { Proctor } from '@/components/test/settings/Proctor';
 
 export const getServerSideProps = (async (args: any) => {  
     try {
@@ -58,7 +59,6 @@ export const getServerSideProps = (async (args: any) => {
                 let testInfo = await db.select().from(tests).where(eq(tests.id, parseInt(args.query.test)))
                 // Grab test settings
                 let settingsInfo = await db.select().from(testSettings).where(eq(testSettings.test_id, parseInt(args.query.test)))
-                console.log(settingsInfo)
                 // Role permission as its protected route
                 // @ts-ignore
                 let rolePermissions = await db.select().from(role).where(eq(role.name, account_infoi[0].role))
@@ -269,9 +269,12 @@ export default function TestSettings(props: InferGetServerSidePropsType<typeof g
                             <h2>Visibility</h2>
                             <div className={styles.testSettings}>
                                 {/* @ts-ignore */}
-                                <Switch name='publish_test' onChange={changeSetting} defaultChecked={props.test_settings[0].visibility == 'active' ? true : false}  label="Publish Test" />
+                                <Switch name='publish_test' onChange={changeSetting} defaultChecked={props.test_settings[0].test_status == 'active' ? true : false}  label="Publish Test" />
                             </div>
-                            <Button onClick={open}>Open Test Wizard</Button>
+                            <div style={{display: 'flex', flexDirection: 'row', gap: '1em'}}>
+                                <Button onClick={open}>Open Test Wizard</Button>
+                                {(props.test_settings[0].enable_proctoring) ? <Proctor /> : null}
+                            </div>
                         </div>
                     </div>
                 </main>

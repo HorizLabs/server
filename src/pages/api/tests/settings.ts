@@ -35,29 +35,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     await db.insert(testSettings).values({
                         'test_id': data.test_id,
                         'allow_retakes': (data.status != undefined && data.name == 'allow_retakes' ? data.status : false),
-                        'test_status': (data.status != undefined && data.status && data.name == 'publish_test' ? 'active' : 'draft'),
-                        'randomize_questions': (data.status != undefined && data.status && data.name == 'randomize_questions' ? data.status : test_settings[0].randomize_questions),
-                        'enable_proctoring': (data.status != undefined && data.status && data.name == 'enable_proctoring' ? data.status : false),
-                        'use_web_platform': (data.status != undefined && data.status && data.name == 'use_web_platform' && experimental == true ? data.status : false)
+                        'test_status': (data.status != undefined && data.name == 'publish_test' ? 'active' : 'draft'),
+                        'randomize_questions': ((data.status != undefined && data.name == 'randomize_questions') ? data.status : false),
+                        'enable_proctoring': (data.status != undefined && data.name == 'enable_proctoring' ? data.status : false),
+                        'use_web_platform': (data.status != undefined && data.name == 'enable_web_platform' ? data.status : false)
                     })
                 } else {
-                    console.log(data.name == 'enable_proctoring', data.status)
                     let settingConstraints = {
                         allow_retakes: (data.status != undefined && data.name == 'allow_retakes' ? data.status : test_settings[0].allow_retakes),
                         test_status: (data.status != undefined && data.status && data.name == 'publish_test' ? 'active' : 'draft'),
-                        randomize_questions: (data.status != undefined && data.status && data.name == 'randomize_questions' ? data.status : test_settings[0].randomize_questions),
-                        enable_proctoring: (data.status != undefined && data.status && data.name == 'enable_proctoring' ? data.status : false),
-                        use_web_platform: (data.status != undefined && data.status && data.name == 'enable_web_platform' ? data.status : false)
+                        randomize_questions: ((data.status != undefined && data.name == 'randomize_questions') ? data.status : test_settings[0].randomize_questions),
+                        enable_proctoring: (data.status != undefined && data.name == 'enable_proctoring' ? data.status : test_settings[0].enable_proctoring),
+                        use_web_platform: (data.status != undefined && data.name == 'enable_web_platform' ? data.status : test_settings[0].use_web_platform)
                     }
-                    console.log(settingConstraints)
                     let s = await db.update(testSettings).set({
                         'allow_retakes': settingConstraints.allow_retakes,
+                        // @ts-ignore
                         'test_status': settingConstraints.test_status,
                         'randomize_questions': settingConstraints.randomize_questions,
                         'enable_proctoring': settingConstraints.enable_proctoring,
                         'use_web_platform': settingConstraints.use_web_platform
                     }).where(eq(testSettings.test_id, data.test_id)).returning()
-                    console.log(s)
                 }
                 res.status(201).json({
                     coreStatus: 'UPDATED_TEST',

@@ -74,3 +74,16 @@ export const role = platform.table('platform_roles', {
     proctorTests: boolean('proctor_tests').default(false),
     manageRoles: boolean('manage_roles').default(false)
 })
+
+export const proctor = platform.table('platform_proctor', {
+    id: serial('id').primaryKey(),
+    test_id: serial('test_id'),
+    instructions: text('instructions'),
+})
+
+export const proctorID = platform.table('platform_proctor_id', {
+    id: serial('id').primaryKey(),
+    test_id: serial('test_id'),
+    proctor_id: serial('proctor_id'),
+    proctor_key: serial('proctor_key'),
+})
