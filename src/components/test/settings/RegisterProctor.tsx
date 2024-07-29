@@ -22,13 +22,13 @@ export function RegisterProctor(props: any) {
                 test_id: test_id
             })
         })
-
-        if ((await response.json()).coreStatus == 'CREATED_ACCOUNT') {
+        let body = await response.json();
+        if (body == 'CREATED_ACCOUNT') {
             setButtonState(false);
             window.location.replace('/users')
         } else {
             setButtonState(false);
-            setError((await response.json()).message)
+            setError(body.message)
         }
     }
 

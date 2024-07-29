@@ -85,7 +85,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 } else {
                     let database_role_query = data?.role.charAt(0).toUpperCase() + data?.role.slice(1)
                     let role_query = await db.select().from(role).where(eq(role.name, database_role_query))
-                    console.log(role_query)
                     if (role_query.length >= 1 && database_role_query != 'Owner' && database_role_query != 'Admin' && database_role_query != 'Staff') {
                         await db.update(account).set({'name': data.name, 'email': data.email, 'role': database_role_query}).where(eq(account.id, data.id))
                         res.status(201).json({

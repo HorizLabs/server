@@ -62,10 +62,11 @@ export const getServerSideProps = (async (args: any) => {
                 // Role permission as its protected route
                 // @ts-ignore
                 let rolePermissions = await db.select().from(role).where(eq(role.name, account_infoi[0].role))
-
+                let proctor_test = await db.select().from(proctor).where(eq(proctor.test_id, parseInt(args.query.test)))
+                console.log(proctor_test)
                 return {
                     props: {sessionStatus: true, account: account_infoi[0], test_info: testInfo, test_id: parseInt(args.query.test),
-                        test_settings: settingsInfo, rolePermissions: rolePermissions, experimental: experimental, proctor_settings: await db.select().from(proctor).where(eq(proctor.test_id, args.query.proctor_id))}
+                        test_settings: settingsInfo, rolePermissions: rolePermissions, experimental: experimental, proctor_settings: proctor_test}
                 }
             }
             return {
@@ -74,8 +75,9 @@ export const getServerSideProps = (async (args: any) => {
         }
     } catch (e) {
         // Catch and attempt to logout 
+        console.log(e)
         return {
-            props: {sessionStatus: false}
+            props: {sessionStatus: true}
         }
     }
 })
