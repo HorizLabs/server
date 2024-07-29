@@ -1,5 +1,5 @@
 import { db } from '@/db/db'
-import { account, role } from '@/db/schema'
+import { account, proctorID, role } from '@/db/schema'
 import * as jwt from 'jose'
 import * as crypto from 'crypto'
 import { eq } from 'drizzle-orm'
@@ -32,8 +32,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     })
                     return;
                 }
-                // Create account
+                // Delete account
                 await db.delete(account).where(eq(account.id, data.id))
+                await db.delete(proctorID).where(eq(proctorID.proctor_id, data.id))
                 res.status(201).json({
                     coreStatus: 'DELETED_ACCOUNT',
                     message: 'Deleted Account Successfully'

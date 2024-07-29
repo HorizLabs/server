@@ -4,7 +4,7 @@ import styles from '@/styles/tests/Settings.module.css'
 // Other imports
 import Head from "next/head";
 import { db } from "@/db/db";
-import { account, role, tests, testSettings } from "@/db/schema";
+import { account, proctor, role, tests, testSettings } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { FormEvent, useEffect, useState } from "react";
 import * as jwt from "jose";
@@ -62,9 +62,10 @@ export const getServerSideProps = (async (args: any) => {
                 // Role permission as its protected route
                 // @ts-ignore
                 let rolePermissions = await db.select().from(role).where(eq(role.name, account_infoi[0].role))
+
                 return {
                     props: {sessionStatus: true, account: account_infoi[0], test_info: testInfo, test_id: parseInt(args.query.test),
-                        test_settings: settingsInfo, rolePermissions: rolePermissions, experimental: experimental}
+                        test_settings: settingsInfo, rolePermissions: rolePermissions, experimental: experimental, proctor_settings: await db.select().from(proctor).where(eq(proctor.test_id, args.query.proctor_id))}
                 }
             }
             return {
@@ -273,7 +274,7 @@ export default function TestSettings(props: InferGetServerSidePropsType<typeof g
                             </div>
                             <div style={{display: 'flex', flexDirection: 'row', gap: '1em'}}>
                                 <Button onClick={open}>Open Test Wizard</Button>
-                                {(props.test_settings[0].enable_proctoring) ? <Proctor /> : null}
+                                {(props.test_settings[0].enable_proctoring) ? <Proctor proctorSettings={props.proctor_settings} proctorID={props.test_id} /> : null}
                             </div>
                         </div>
                     </div>

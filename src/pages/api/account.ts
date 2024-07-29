@@ -1,5 +1,5 @@
 import { db } from '@/db/db'
-import { account, question_bank, questionSubmission, role, test_access, tests, testSettings } from '@/db/schema'
+import { account, proctor, proctorID, question_bank, questionSubmission, role, test_access, tests, testSettings } from '@/db/schema'
 import * as jwt from 'jose'
 import * as crypto from 'crypto'
 import { eq } from 'drizzle-orm'
@@ -71,6 +71,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     await db.delete(test_access)
                     await db.delete(questionSubmission)
                     await db.delete(role)
+                    await db.delete(proctor)
+                    await db.delete(proctorID)
                     
                     res.status(201).json({
                         coreStatus: 'CONFIRMED_DELETED',
@@ -84,7 +86,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 let hash_password = crypto.pbkdf2Sync(password, salt, 19847, 80, 'sha512').toString('hex')
                 if (hash_password == accountInfo[0].password && confirmation == true) {
                     await db.delete(account).where(eq(account.id, accountInfo[0].id))
-                    
+                    await db.delete(proctorID).where(eq(proctorID.proctor_id, accountInfo[0].id))
                     res.status(201).json({
                         coreStatus: 'CONFIRMED_DELETED',
                         message: 'Account has been deleted. Have a good day!'

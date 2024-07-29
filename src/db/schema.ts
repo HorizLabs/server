@@ -85,5 +85,4 @@ export const proctorID = platform.table('platform_proctor_id', {
     id: serial('id').primaryKey(),
     test_id: serial('test_id'),
     proctor_id: serial('proctor_id'),
-    proctor_key: serial('proctor_key'),
 })
