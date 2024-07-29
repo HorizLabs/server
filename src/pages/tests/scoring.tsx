@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { db } from "@/db/db";
-import { account, questionSubmission, tests } from "@/db/schema";
+import { account, questionSubmission, role, tests } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { useEffect, useState } from "react";
 import * as jwt from "jose";
@@ -49,8 +49,10 @@ export const getServerSideProps = (async (args: any) => {
             if (args.query.test != undefined) {
                 let testInfo = await db.select().from(tests).where(eq(tests.id, parseInt(args.query.test)))
                 let scoring_scores = await db.select().from(questionSubmission)
+                // @ts-ignore
+                let rolePermissions = await db.select().from(role).where(eq(role.name, account_info[0].role))
                 return {
-                    props: {sessionStatus: true, account: account_info[0], test_info: testInfo, test_id: parseInt(args.query.test), scoring_scores: scoring_scores}
+                    props: {sessionStatus: true, account: account_info[0], test_info: testInfo, test_id: parseInt(args.query.test), scoring_scores: scoring_scores, rolePermissions: rolePermissions}
                 }
             }
             return {
@@ -79,6 +81,10 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
                 <meta httpEquiv="refresh" content="0;url=/" />
             </Head>
         )    
+    }
+    // @ts-ignore
+    if (typeof props.rolePermissions != 'undefined' && props.rolePermissions?.length != 0 && ((props.rolePermissions[0].gradeTestResponses == false)) || props.account?.role == 'staff') {
+        window.location.replace('/tests')
     }
 
     // Diverge based on test ID

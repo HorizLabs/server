@@ -17,6 +17,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import DeleteTest from '@/components/DeleteTest';
 import Link from 'next/link';
+import { experimental } from '@/lib/experimental';
 
 export const getServerSideProps = (async (args: any) => {  
     try {
@@ -56,16 +57,14 @@ export const getServerSideProps = (async (args: any) => {
                 // Get further test info and send it off
                 let testInfo = await db.select().from(tests).where(eq(tests.id, parseInt(args.query.test)))
                 // Grab test settings
-                let settingsInfo = await db.select({
-                    allow_retakes: testSettings.allow_retakes,
-                    visibility: testSettings.test_status,
-                    randomize_questions: testSettings.randomize_questions
-                }).from(testSettings).where(eq(testSettings.test_id, parseInt(args.query.test)))
+                let settingsInfo = await db.select().from(testSettings).where(eq(testSettings.test_id, parseInt(args.query.test)))
+                console.log(settingsInfo)
                 // Role permission as its protected route
                 // @ts-ignore
                 let rolePermissions = await db.select().from(role).where(eq(role.name, account_infoi[0].role))
                 return {
-                    props: {sessionStatus: true, account: account_infoi[0], test_info: testInfo, test_id: parseInt(args.query.test), test_settings: settingsInfo, rolePermissions: rolePermissions}
+                    props: {sessionStatus: true, account: account_infoi[0], test_info: testInfo, test_id: parseInt(args.query.test),
+                        test_settings: settingsInfo, rolePermissions: rolePermissions, experimental: experimental}
                 }
             }
             return {
@@ -259,6 +258,13 @@ export default function TestSettings(props: InferGetServerSidePropsType<typeof g
                                 {/* @ts-ignore */}
                                 <Switch name='randomize_questions' onChange={changeSetting} defaultChecked={props.test_settings[0].randomize_questions}  label="Randomize Questions" />
                                 
+                            </div>
+                            <h2>Testtaking & Security</h2>
+                            <div className={styles.testSettings}>
+                                {/* @ts-ignore */}
+                                <Switch name='enable_proctoring' onChange={changeSetting} defaultChecked={props.test_settings[0].enable_proctoring}  label="Enable Proctoring" />
+                                {/* @ts-ignore */}
+                                {props.experimental ? <Switch name='enable_web_platform' onChange={changeSetting} defaultChecked={props.test_settings[0].use_web_platform}  label="(EXPERIMENTAL) Use Web Platform" /> : null}
                             </div>
                             <h2>Visibility</h2>
                             <div className={styles.testSettings}>

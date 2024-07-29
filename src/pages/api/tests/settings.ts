@@ -4,6 +4,7 @@ import * as jwt from 'jose'
 import * as crypto from 'crypto'
 import { eq } from 'drizzle-orm'
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { experimental } from '@/lib/experimental'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method == 'PUT') {
@@ -36,19 +37,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         'allow_retakes': (data.status != undefined && data.name == 'allow_retakes' ? data.status : false),
                         'test_status': (data.status != undefined && data.status && data.name == 'publish_test' ? 'active' : 'draft'),
                         'randomize_questions': (data.status != undefined && data.status && data.name == 'randomize_questions' ? data.status : test_settings[0].randomize_questions),
+                        'enable_proctoring': (data.status != undefined && data.status && data.name == 'enable_proctoring' ? data.status : false),
+                        'use_web_platform': (data.status != undefined && data.status && data.name == 'use_web_platform' && experimental == true ? data.status : false)
                     })
                 } else {
+                    console.log(data.name == 'enable_proctoring', data.status)
                     let settingConstraints = {
-                        allowRetakes: (data.status != undefined && data.name == 'allow_retakes' ? data.status : test_settings[0].allow_retakes),
-                        visibility: (data.status != undefined && data.status && data.name == 'publish_test' ? 'active' : 'draft'),
-                        randomize_questions: (data.status != undefined && data.status && data.name == 'randomize_questions' ? data.status : test_settings[0].randomize_questions)
+                        allow_retakes: (data.status != undefined && data.name == 'allow_retakes' ? data.status : test_settings[0].allow_retakes),
+                        test_status: (data.status != undefined && data.status && data.name == 'publish_test' ? 'active' : 'draft'),
+                        randomize_questions: (data.status != undefined && data.status && data.name == 'randomize_questions' ? data.status : test_settings[0].randomize_questions),
+                        enable_proctoring: (data.status != undefined && data.status && data.name == 'enable_proctoring' ? data.status : false),
+                        use_web_platform: (data.status != undefined && data.status && data.name == 'enable_web_platform' ? data.status : false)
                     }
-                    await db.update(testSettings).set({
-                        'allow_retakes': settingConstraints.allowRetakes,
-                        // @ts-ignore
-                        'test_status': settingConstraints.visibility,
-                        'randomize_questions': settingConstraints.randomize_questions
-                    }).where(eq(testSettings.test_id, data.test_id))
+                    console.log(settingConstraints)
+                    let s = await db.update(testSettings).set({
+                        'allow_retakes': settingConstraints.allow_retakes,
+                        'test_status': settingConstraints.test_status,
+                        'randomize_questions': settingConstraints.randomize_questions,
+                        'enable_proctoring': settingConstraints.enable_proctoring,
+                        'use_web_platform': settingConstraints.use_web_platform
+                    }).where(eq(testSettings.test_id, data.test_id)).returning()
+                    console.log(s)
                 }
                 res.status(201).json({
                     coreStatus: 'UPDATED_TEST',

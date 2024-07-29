@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { db } from "@/db/db";
-import { account, tests } from "@/db/schema";
+import { account, role, tests } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { useEffect, useState } from "react";
 import * as jwt from "jose";
@@ -54,8 +54,10 @@ export const getServerSideProps = (async (args: any) => {
                     props: {sessionStatus: true, account: account_info[0], test_info: testInfo, test_id: parseInt(args.query.test)}
                 }
             }
+            // @ts-ignore
+            let rolePermissions = await db.select().from(role).where(eq(role.name, account_info[0].role))
             return {
-                props: {sessionStatus: true, account: account_info[0], test_info: testInfo}
+                props: {sessionStatus: true, account: account_info[0], test_info: testInfo, rolePermissions: rolePermissions}
             }
         }
     } catch {
@@ -127,6 +129,7 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
     }
 
     let account_info = props.account
+
     // Diverge based on test ID
     if (props.test_id != undefined && props.test_info[0] != undefined) {
         let id = props.test_id
@@ -242,7 +245,9 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
                 </div>
                 <div className={styles.testContainer}>
                     <div className={styles.createTest}>
-                        {(account_info?.role == 'owner' || account_info?.role == 'admin') ? (<Button className={styles.createButton} onClick={open}><span className={styles.textContent}><FilePlus />  Create a test</span></Button>) : null}
+                        {/* @ts-ignore */}
+                        {(( typeof props.rolePermissions != 'undefined' && props.rolePermissions?.length != 0 && (props.rolePermissions[0].createTests == false)) || account_info?.role == 'owner' || account_info?.role == 'admin') ? (<Button className={styles.createButton} onClick={open}><span className={styles.textContent}>
+                            <FilePlus />  Create a test</span></Button>) : null}
                     </div>
                     {/* <div className={styles.header}>
                         <h2>Active Tests</h2>

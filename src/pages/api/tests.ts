@@ -1,5 +1,5 @@
 import { db } from '@/db/db'
-import { account, question_bank, test_access, tests, testSettings } from '@/db/schema'
+import { account, question_bank, role, test_access, tests, testSettings } from '@/db/schema'
 import * as jwt from 'jose'
 import * as crypto from 'crypto'
 import { eq } from 'drizzle-orm'
@@ -15,7 +15,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             let info = await await (await jwt.jwtVerify(cookie, crypto.createSecretKey(process.env.JWT_SECRET, 'utf-8')));
             // @ts-ignore
             let accountInfo = await db.select().from(account).where(eq(account.email, info.payload.email))
-            if (accountInfo[0].role == 'owner' || accountInfo[0].role == 'admin') {
+            // @ts-ignore
+            let roleCheck = await db.select().from(role).where(eq(role.name, accountInfo[0].role))
+            if (accountInfo[0].role == 'owner' || accountInfo[0].role == 'admin' || (roleCheck.length != 0 && roleCheck[0].createTests == true)) {
                 let s = await db.insert(tests).values({
                     'description': data.description,
                     'name': data.name,
