@@ -13,7 +13,7 @@ export function CreateRole() {
         event.preventDefault();
         setButtonState(true)
         let info = new FormData(event.target);
-        const response = await fetch('/api/role/create', {
+        const response = await fetch('/api/role/', {
             method: 'POST',
             body: JSON.stringify(Object.fromEntries(info))
         })
