@@ -105,23 +105,23 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
             window.location.href = '/logout'
         }
     })
-    // // @ts-ignore
-    // if (props.testInformation[0].enable_proctoring == false || props.testInformation[0].test_status != 'active') {
-    //     return (
-    //         <div style={{
-    //             display: 'flex',
-    //             justifyContent: 'center',
-    //             flexDirection: 'column',
-    //             alignItems: 'center',
-    //             height: '100vh',
-    //             gap: 10
-    //         }}>
-    //             <Image src={'/logo.png'} alt="Logo" width={75} height={75} />
-    //             <h3>Proctoring is either disabled or not currently available for this test.</h3>
-    //             <Button component={Link} href={'/dashboard'}>Return to Dashboard</Button>
-    //         </div>
-    //     )
-    // }
+    // @ts-ignore
+    if (props.testInformation[0].enable_proctoring == false || props.testInformation[0].test_status != 'active') {
+        return (
+            <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                flexDirection: 'column',
+                alignItems: 'center',
+                height: '100vh',
+                gap: 10
+            }}>
+                <Image src={'/logo.png'} alt="Logo" width={75} height={75} />
+                <h3>Proctoring is either disabled or not currently available for this test.</h3>
+                <Button component={Link} href={'/dashboard'}>Return to Dashboard</Button>
+            </div>
+        )
+    }
 
     if (props.accountLoginStatus) {
         return (

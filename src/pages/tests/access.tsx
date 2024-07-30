@@ -73,7 +73,7 @@ export const getServerSideProps = (async (args: any) => {
         console.log(e)
         // Catch and attempt to logout 
         return {
-            props: {sessionStatus: true}
+            props: {sessionStatus: false}
         }
     }
 })

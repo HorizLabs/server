@@ -68,7 +68,7 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
         </div>
         <div className={styles.login_form}>
           <div className={styles.login_form_header}>
-            <Image src="/logo.png" alt="Horizon Labs Logo" width={100} height={100} />
+            <Image src="/logo.png" alt="Horizon Labs Logo" width={50} height={50} />
             <h2>{props.accountCreationStatus ? 'Login to Horizon Labs.' : 'Create your Horizon Labs Account.'}</h2>
           </div>
           <form className={styles.account_form} onSubmit={accountSystem}>
