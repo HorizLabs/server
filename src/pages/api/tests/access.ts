@@ -1,5 +1,5 @@
 import { db } from '@/db/db'
-import { account, question_bank, questionSubmission, test_access, tests, testSettings } from '@/db/schema'
+import { account, question_bank, questionSubmission, role, test_access, tests, testSettings } from '@/db/schema'
 import * as jwt from 'jose'
 import * as crypto from 'crypto'
 import { eq } from 'drizzle-orm'
@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             let accountInfo = await db.select().from(account).where(eq(account.email, info.payload.email))
             // @ts-ignore
             let roleCheck = await db.select().from(role).where(eq(role.name, accountInfo[0].role))
-            if (accountInfo.length == 0 || (roleCheck.length != 0 && roleCheck[0].createTestCredentials == false) || accountInfo[0].role == 'staff') {
+            if (accountInfo.length == 0 || (roleCheck.length != 0 && (roleCheck[0].createTestCredentials == false)) || accountInfo[0].role == 'staff') {
                 res.status(400).json({
                     coreStatus: 'CANNOT_ALLOW',
                     message: 'Your account does not exist.'
@@ -43,6 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 // })
             }
         } catch (e) {
+            console.log(e)
             res.status(400).json({
                 coreStatus: 'ERROR',
                 message: 'An error has occurred.'
@@ -57,6 +58,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             let info = await await (await jwt.jwtVerify(cookie, crypto.createSecretKey(process.env.JWT_SECRET, 'utf-8')));
             // @ts-ignore
             let accountInfo = await db.select().from(account).where(eq(account.email, info.payload.email))
+            // @ts-ignore
+            let roleCheck = await db.select().from(role).where(eq(role.name, accountInfo[0].role))
+            if (accountInfo.length == 0 || (roleCheck.length != 0 && (roleCheck[0].createTestCredentials == false)) || accountInfo[0].role == 'staff') {
+                res.status(400).json({
+                    coreStatus: 'CANNOT_ALLOW',
+                    message: 'Your account does not exist.'
+                })
+                return;
+            }
             if (accountInfo.length == 0) {
                 res.status(400).json({
                     coreStatus: 'CANNOT_ALLOW',
@@ -64,9 +74,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 })
             } else {
                 // @ts-ignore
-                await db.delete(test_access).where(eq(test_access.id, data.participant_id))
+                await db.delete(questionSubmission).where(eq(questionSubmission.participant_id, data.participant_id))
                 // @ts-ignore
-                await db.delete(questionSubmission).where(eq(questionSubmission.participant_id. data.participant_id))
+                await db.delete(test_access).where(eq(test_access.id, data.participant_id))
                 res.status(201).json({
                     coreStatus: 'REVOKED_ACCESS',
                     message: 'Successfully revoked the requested credentials.'
@@ -78,6 +88,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 // })
             }
         } catch (e) {
+            console.log(e)
             res.status(400).json({
                 coreStatus: 'ERROR',
                 message: 'An error has occurred.'

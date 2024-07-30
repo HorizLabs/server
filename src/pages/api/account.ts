@@ -1,5 +1,5 @@
 import { db } from '@/db/db'
-import { account, proctor, proctorID, question_bank, questionSubmission, role, test_access, tests, testSettings } from '@/db/schema'
+import { accessProctorMap, account, proctor, proctorID, question_bank, questionSubmission, role, test_access, tests, testSettings } from '@/db/schema'
 import * as jwt from 'jose'
 import * as crypto from 'crypto'
 import { eq } from 'drizzle-orm'
@@ -73,6 +73,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     await db.delete(role)
                     await db.delete(proctor)
                     await db.delete(proctorID)
+                    await db.delete(accessProctorMap)
                     
                     res.status(201).json({
                         coreStatus: 'CONFIRMED_DELETED',

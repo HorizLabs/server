@@ -130,15 +130,18 @@ export default function Tests(props: InferGetServerSidePropsType<typeof getServe
 
     let account_info = props.account
     // @ts-ignore
-    if (props.account.role != 'owner' || props.account.role != 'admin' 
+    if (props.account.role != 'staff'
         // @ts-ignore
-        || (props.rolePermissions?.length != 0 && (props.rolePermissions[0].createTests == false
+        && (props.rolePermissions?.length > 0
+            // @ts-ignore
+             && (props.rolePermissions[0].createTests == false
         // @ts-ignore
         || props.rolePermissions[0].createTestCredentials == false
         // @ts-ignore
         ||  props.rolePermissions[0].createTestQuestions == false
         // @ts-ignore
         || props.rolePermissions[0].gradeTestResponses == false))) {
+
         return (
             <Head>
                 <meta httpEquiv="refresh" content="0;url=/dashboard" />

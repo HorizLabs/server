@@ -86,3 +86,10 @@ export const proctorID = platform.table('platform_proctor_id', {
     test_id: serial('test_id'),
     proctor_id: serial('proctor_id'),
 })
+
+export const accessProctorMap = platform.table('platform_access_proctor_map', {
+    id: serial('id').primaryKey(),
+    test_id: serial('test_id'),
+    proctor_id: serial('proctor_id'),
+    participant_id: serial('participant_id'),
+})

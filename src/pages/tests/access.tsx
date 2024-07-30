@@ -4,7 +4,7 @@ import styles from '@/styles/tests/Access.module.css'
 // Imports
 import Head from "next/head";
 import { db } from "@/db/db";
-import { account, question_bank, role, test_access, tests } from "@/db/schema";
+import { account, proctorID, question_bank, role, test_access, tests, testSettings } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { useEffect, useState } from "react";
 import * as jwt from "jose";
@@ -12,7 +12,7 @@ import * as crypto from "crypto";
 import { InferGetServerSidePropsType } from "next";
 import Navbar from "@/components/Navbar";
 import { Activity, ArrowLeft, Eye, EyeOff } from "react-feather";
-import { Button, Loader, Modal, TextInput } from "@mantine/core";
+import { Button, Loader, Modal, Select, TextInput } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
 import { RenderDownload } from '@/components/RenderDownload';
 import Link from 'next/link';
@@ -55,10 +55,14 @@ export const getServerSideProps = (async (args: any) => {
             if (args.query.test != undefined) {
                 let testInfo = await db.select().from(tests).where(eq(tests.id, parseInt(args.query.test)))
                 let accessInfo = await db.select().from(test_access).where(eq(test_access.test_id, parseInt(args.query.test)))
+                let testConfig = await db.select().from(testSettings).where(eq(testSettings.test_id, parseInt(args.query.test)))
+                let proctor_check = await db.select().from(proctorID).where(eq(proctorID.test_id, parseInt(args.query.test)))
                 // @ts-ignore
                 let roler = await db.select().from(role).where(eq(role.name, account_info[0].role))
                 return {
-                    props: {sessionStatus: true, account: account_info[0], test_info: testInfo, test_id: parseInt(args.query.test), access_info: accessInfo, role: roler}
+                    props: {sessionStatus: true, account: account_info[0], test_info: testInfo,
+                    test_id: parseInt(args.query.test), access_info: accessInfo, role: roler, test_config: testConfig,
+                    proctor_check: proctor_check}
                 }
             }
             return {
@@ -88,7 +92,12 @@ export default function UserAccess(props: InferGetServerSidePropsType<typeof get
             </Head>
         )    
     }
-
+    // @ts-ignore
+    let proctor_data = []
+    // @ts-ignore
+    props.proctor_check.map((proctor, id) => {
+        proctor_data.push(proctor.proctor_id.toString())
+    })
     let account_info = props.account
     // Diverge based on test ID
     if (props.test_id != undefined && props.test_info[0] != undefined) {
@@ -145,7 +154,8 @@ export default function UserAccess(props: InferGetServerSidePropsType<typeof get
                         <form onSubmit={createAccessCredentials} style={{gap: 10, display: 'flex', flexDirection: 'column'}} >
                             <h1>Create user credentials</h1>
                             {sError == '' ? null : <p style={{color: 'red'}}>{sError}</p>}
-                            <TextInput type='text' name='participant_name' placeholder='name' label="Participant Name" required/>
+                            {(props.test_config[0].enable_proctoring && props.proctor_check.length != 0) ? <Select type='int' data={['A','B']} name='email' placeholder='Proctor Email' label="Proctor Email" required/> : null}
+                            <TextInput type='text' name='participant_name' placeholder='Participant Name' label="Participant Name" required/>
                             {buttonLoading ? <Button><Loader color='white' style={{transform: 'scale(0.7)'}} /></Button>: <Button type='submit'>Create</Button>}
                         </form>
                     </Modal.Body>

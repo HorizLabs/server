@@ -109,7 +109,7 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
 
     let account_info = props.account
     // @ts-ignore
-    let proctoringRoleDetermination = (props.role).proctorTests
+    let proctoringRoleDetermination = props.role != undefined ? (props.role).proctorTests : false
     // Continue with flow
     return(
         <>
