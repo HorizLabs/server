@@ -12,7 +12,7 @@ import * as crypto from "crypto";
 import { InferGetServerSidePropsType } from "next";
 import Navbar from "@/components/Navbar";
 import { Activity, ArrowLeft, Eye, EyeOff } from "react-feather";
-import { Button, Loader, Modal, Select, TextInput } from "@mantine/core";
+import { Button, Loader, Modal, TextInput } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
 import { RenderDownload } from '@/components/RenderDownload';
 import Link from 'next/link';
@@ -92,12 +92,7 @@ export default function UserAccess(props: InferGetServerSidePropsType<typeof get
             </Head>
         )    
     }
-    // @ts-ignore
-    let proctor_data = []
-    // @ts-ignore
-    props.proctor_check.map((proctor, id) => {
-        proctor_data.push(proctor.proctor_id.toString())
-    })
+
     let account_info = props.account
     // Diverge based on test ID
     if (props.test_id != undefined && props.test_info[0] != undefined) {
@@ -121,7 +116,9 @@ export default function UserAccess(props: InferGetServerSidePropsType<typeof get
                 'method': 'POST',
                 'body': JSON.stringify({
                     'participant_name': participant_name,
-                    'test_id': id
+                    'test_id': id,
+                    'proctor_email': props.test_config[0].enable_proctoring && props.proctor_check.length != 0 ? data.proctor_email?.value : null
+
                 })
             })
             data = await res.json()
@@ -154,8 +151,8 @@ export default function UserAccess(props: InferGetServerSidePropsType<typeof get
                         <form onSubmit={createAccessCredentials} style={{gap: 10, display: 'flex', flexDirection: 'column'}} >
                             <h1>Create user credentials</h1>
                             {sError == '' ? null : <p style={{color: 'red'}}>{sError}</p>}
-                            {(props.test_config[0].enable_proctoring && props.proctor_check.length != 0) ? <Select type='int' data={['A','B']} name='email' placeholder='Proctor Email' label="Proctor Email" required/> : null}
                             <TextInput type='text' name='participant_name' placeholder='Participant Name' label="Participant Name" required/>
+                            {(props.test_config[0].enable_proctoring && props.proctor_check.length != 0) ? <TextInput type='email' name='proctor_email' placeholder='Proctor Email' label="Proctor Email" required/> : null}
                             {buttonLoading ? <Button><Loader color='white' style={{transform: 'scale(0.7)'}} /></Button>: <Button type='submit'>Create</Button>}
                         </form>
                     </Modal.Body>

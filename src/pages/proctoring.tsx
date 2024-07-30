@@ -1,15 +1,17 @@
 import Head from "next/head";
 import { db } from "@/db/db";
-import { account, proctorID, role, tests } from "@/db/schema";
+import { accessProctorMap, account, proctorID, role, test_access, tests } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { useEffect } from "react";
 import * as jwt from "jose";
 import * as crypto from "crypto";
 import { InferGetServerSidePropsType } from "next";
 import Navbar from "@/components/Navbar";
-import styles from '@/styles/Dashboard.module.css'
+import styles from '@/styles/Proctoring.module.css'
+import { Button, Table } from "@mantine/core";
+import Image from "next/image";
 import Link from "next/link";
-import { Badge, Button, Card, Group, Text } from "@mantine/core";
+import { Download } from "react-feather";
 
 export const getServerSideProps = (async (args: any) => {  
     try {
@@ -57,10 +59,30 @@ export const getServerSideProps = (async (args: any) => {
                 } else {
                     testInformation = []
                 }
-
+                let test_takers = await db.select().from(accessProctorMap).where(eq(accessProctorMap.test_id, parseInt(test_id)))
+                // @ts-ignore
+                let test_mapping = []
+                await Promise.all(test_takers.map(async (test_taker) => {
+                    let testInfo = await db.select().from(test_access).where(eq(test_access.id, test_taker.participant_id))
+                    if (testInfo.length != 0) {
+                        test_mapping.push(testInfo[0])
+                    }
+                }))
+                if (test_mapping.length > 0) {
+                    return {
+                        // Ternary operator for that determination
+                        props: {sessionStatus: true, account: account_info[0], role: permission,
+                            testInformation: testInformation,
+                            // @ts-ignore
+                            test_id:parseInt(test_id), test_takers: test_mapping}
+                    }
+                }
                 return {
                     // Ternary operator for that determination
-                    props: {sessionStatus: true, account: account_info[0], role: permission, testInformation: testInformation,test_id:parseInt(test_id)}
+                    props: {sessionStatus: true, account: account_info[0], role: permission,
+                        testInformation: testInformation,
+                        // @ts-ignore
+                        test_id:parseInt(test_id)}
                 }
             }
             return {
@@ -83,6 +105,24 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
             window.location.href = '/logout'
         }
     })
+    // // @ts-ignore
+    // if (props.testInformation[0].enable_proctoring == false || props.testInformation[0].test_status != 'active') {
+    //     return (
+    //         <div style={{
+    //             display: 'flex',
+    //             justifyContent: 'center',
+    //             flexDirection: 'column',
+    //             alignItems: 'center',
+    //             height: '100vh',
+    //             gap: 10
+    //         }}>
+    //             <Image src={'/logo.png'} alt="Logo" width={75} height={75} />
+    //             <h3>Proctoring is either disabled or not currently available for this test.</h3>
+    //             <Button component={Link} href={'/dashboard'}>Return to Dashboard</Button>
+    //         </div>
+    //     )
+    // }
+
     if (props.accountLoginStatus) {
         return (
             <Head>
@@ -99,8 +139,7 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
         )
     }
     let account_info = props.account
-    // @ts-ignore
-    let proctoringRoleDetermination = (props.role).proctorTests
+
     // Continue with flow
     return(
         <>
@@ -110,8 +149,36 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-
             <Navbar />
+            <main className={styles.content}>
+                <h1>Test Information</h1>
+                <h2>Test-takers registered to you</h2>
+                <Table>
+                    <Table.Thead>
+                        <Table.Tr>
+                            <Table.Th>Testtaker Name</Table.Th>
+                            <Table.Th>Testtaker ID</Table.Th>
+                            <Table.Th>Access Card</Table.Th>
+                        </Table.Tr>
+                    </Table.Thead>
+                    <Table.Tbody>
+                        {/* @ts-ignore */}
+                        {props.test_takers.map((test_taker, id) => {
+                            return (
+                                <Table.Tr key={id}>
+                                    <Table.Td>{test_taker.participant_name}</Table.Td>
+                                    <Table.Td>{test_taker.username}</Table.Td>
+                                    <Table.Td className={styles.download}>
+                                        <a href={`/api/access_card?name=${test_taker.participant_name}&username=${test_taker.username}&password=${test_taker.password}`} className={styles.downloadInformation}>
+                                            <Download color='black' />
+                                        </a>
+                                    </Table.Td>
+                                </Table.Tr>
+                            )
+                        })}
+                    </Table.Tbody>
+                </Table>
+            </main>
         </>
     )
 }

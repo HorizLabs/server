@@ -1,0 +1,13 @@
+.content {
+  display: flex;
+  gap: 1em;
+  flex: 1;
+  margin-left: 310px;
+  flex-direction: column;
+}
+
+.download {
+  display: flex;
+  gap: 1em;
+  justify-content: center;
+}
